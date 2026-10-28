@@ -1,0 +1,6 @@
+{
+  "name": "PWLC | People Who Loves Clothes",
+  "description": "Official storefront for PWLC. Limited Drop 01 featuring the Signature Washed Black Heavyweight Oversized T-Shirt.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
