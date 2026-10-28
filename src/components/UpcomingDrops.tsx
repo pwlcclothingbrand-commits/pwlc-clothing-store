@@ -27,7 +27,7 @@ export const UpcomingDrops: React.FC<UpcomingDropsProps> = ({
               Upcoming Earth Design Editions
             </h2>
             <p className="mt-3 text-sm text-zinc-400 max-w-xl leading-relaxed">
-              PWLC 002 Pink Earth, PWLC 003 White Earth, and PWLC 004 Light Blue Earth. Each 60 AED with 15 AED local / 30 AED standard delivery. Strictly 6 pieces per size upon release.
+              PWLC 002 Pink Earth, PWLC 003 White Earth, and PWLC 004 Light Blue Earth. Each 75 AED with 15 AED local / 30 AED standard delivery. Strictly 6 pieces per size upon release.
             </p>
           </div>
 

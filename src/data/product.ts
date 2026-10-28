@@ -1,11 +1,11 @@
 import { SizeInventory, Colorway } from '../types';
 
 export const INITIAL_INVENTORY: SizeInventory[] = [
-  { size: 'XS', stock: 6, label: 'Extra Small' },
+  { size: 'XS', stock: 0, label: 'Extra Small' },
   { size: 'S', stock: 6, label: 'Small' },
   { size: 'M', stock: 6, label: 'Medium' },
   { size: 'L', stock: 6, label: 'Large' },
-  { size: 'XL', stock: 6, label: 'Extra Large' },
+  { size: 'XL', stock: 0, label: 'Extra Large' },
   { size: 'XXL', stock: 0, label: 'Double Extra Large' },
 ];
 
@@ -16,13 +16,13 @@ export const COLORWAYS: Colorway[] = [
     colorName: 'Black Earth',
     hex: '#1c1c1f',
     status: 'available',
-    releaseTag: 'PWLC 001 · AVAILABLE NOW (6 PER SIZE)',
+    releaseTag: 'PWLC 001 · AVAILABLE NOW (LIMITED DROP)',
     dropNumber: 'PWLC 001',
-    image: '/assets/aistudio/Washed_Black_Oversized_T-Shirt_Mockup_2835bf2a.png',
-    price: 60.0,
+    image: '/assets/aistudio/E7D5F1CA-8D3C-4A77-A237-AAA7C1049FF9_7ec0d0b0.png',
+    price: 75.0,
     description:
-      'PWLC 001 Black Earth Design. Crafted on dense 300 GSM combed compact cotton with an individual mineral wash and the signature scarlet red PWLC brushwork on the left chest.',
-    washDetails: 'Deep black earth mineral wash with distressed seam fades',
+      'PWLC 001 Black Earth Design. Dual-print heavyweight 300 GSM combed compact cotton. Features the scarlet PWLC script on the front chest and the iconic luminous Earth graphic with community manifesto on the back.',
+    washDetails: 'Deep black mineral wash with distressed seam fades and back Earth screenprint',
   },
   {
     id: 'pwlc-002-pink-earth',
@@ -32,25 +32,25 @@ export const COLORWAYS: Colorway[] = [
     status: 'coming_soon',
     releaseTag: 'PWLC 002 · COMING SOON',
     dropNumber: 'PWLC 002',
-    image: '/assets/aistudio/Pink_PWLC_Vintage-Wash_T-Shirt_Mockup_e8940c68.png',
-    price: 60.0,
+    image: '/assets/aistudio/2902FF53-9F04-43C2-BC8E-F49565DFADD3_6c2e1bb0.png',
+    price: 75.0,
     description:
-      'PWLC 002 Pink Earth Design. Pigment-dyed and enzyme washed for an organic earthy pink patina, finished with scarlet PWLC chest script and 1.25" rib crew collar.',
-    washDetails: 'Vintage pink earth pigment wash with soft broken-in hand',
+      'PWLC 002 Pink Earth Design. Pigment-dyed and enzyme washed for an organic earthy pink patina, with scarlet PWLC chest script and back Earth community insignia.',
+    washDetails: 'Vintage pink earth pigment wash with soft broken-in hand and back screenprint',
   },
   {
     id: 'pwlc-003-white-earth',
     name: 'PWLC 003 White Earth Design',
     colorName: 'White Earth',
-    hex: '#d5cbb6',
+    hex: '#eae3d2',
     status: 'coming_soon',
     releaseTag: 'PWLC 003 · COMING SOON',
     dropNumber: 'PWLC 003',
-    image: '/assets/aistudio/Washed_Stone_PWLC_Oversized_T-Shirt_5caab4dc.png',
-    price: 60.0,
+    image: '/assets/aistudio/8868D36A-0480-4E5F-BF42-F6EA04A32757_66027b4d.png',
+    price: 75.0,
     description:
-      'PWLC 003 White Earth Design. Warm unbleached stone white wash on heavyweight 300 GSM jersey, accented with high-density red PWLC chest insignia.',
-    washDetails: 'Warm mineral stone white wash with raw organic undertone',
+      'PWLC 003 White Earth Design. Warm unbleached stone white wash on heavyweight 300 GSM jersey, accented with high-density red PWLC chest insignia and back Earth graphic.',
+    washDetails: 'Warm mineral stone white wash with raw organic undertone and back Earth screenprint',
   },
   {
     id: 'pwlc-004-light-blue-earth',
@@ -60,11 +60,11 @@ export const COLORWAYS: Colorway[] = [
     status: 'coming_soon',
     releaseTag: 'PWLC 004 · COMING SOON',
     dropNumber: 'PWLC 004',
-    image: '/assets/aistudio/Ice_Blue_PwLc_Oversized_T-Shirt_Mockup_d5af21d5.png',
-    price: 60.0,
+    image: '/assets/aistudio/B3A446FF-95E4-43EC-B5E2-E59B31566A2A_ab85b10c.jpeg',
+    price: 75.0,
     description:
       'PWLC 004 Light Blue Earth Design. Soft mineral glacial wash with weathered highlights and signature red PWLC branding on boxy drop-shoulder cut.',
-    washDetails: 'Glacial light blue earth mineral fade with micro-texture',
+    washDetails: 'Glacial light blue earth mineral fade with back Earth screenprint',
   },
   {
     id: 'pwlc-005-grey-earth',
@@ -74,8 +74,8 @@ export const COLORWAYS: Colorway[] = [
     status: 'coming_soon',
     releaseTag: 'PWLC 005 · COMING SOON',
     dropNumber: 'PWLC 005',
-    image: '/assets/aistudio/Grey_Acid-Wash_T-Shirt_with_Red_Logo_d2491fdc.png',
-    price: 60.0,
+    image: '/assets/aistudio/E7D5F1CA-8D3C-4A77-A237-AAA7C1049FF9_7ec0d0b0.png',
+    price: 75.0,
     description:
       'PWLC 005 Grey Acid Earth Design. Heavy industrial acid marl with textured grain patina, drop shoulders, and vibrant scarlet red chest signature.',
     washDetails: 'Heavy stone acid marl with textured grain patina',
@@ -87,6 +87,7 @@ export const PRODUCT_DATA = {
   brandFullName: 'PEOPLE WHO LOVES CLOTHES',
   currency: 'AED',
   currencySymbol: 'AED',
+  price: 75.0,
   standardDeliveryPrice: 30.0,
   closeDeliveryPrice: 15.0,
   weight: '300 GSM',
@@ -97,7 +98,7 @@ export const PRODUCT_DATA = {
   details: [
     '300 GSM ultra-heavyweight combed organic cotton',
     'Custom boxy silhouette with elongated dropped shoulder seams',
-    'Signature PWLC red brush script chest graphic with subtext',
+    'Dual-side screenprint: Scarlet PWLC chest script + Back Earth Manifesto',
     'Individual mineral enzyme wash — no two shirts are identical',
     'Thick 1.25" (32mm) reinforced tight-ribbed neckline',
     'Pre-shrunk fabric ensuring zero shrink post cold wash',

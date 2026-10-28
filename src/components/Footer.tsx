@@ -90,7 +90,7 @@ export const Footer: React.FC<FooterProps> = ({ onResetInventory }) => {
             <button
               onClick={onResetInventory}
               className="flex items-center gap-1.5 text-zinc-500 hover:text-zinc-300 transition-colors"
-              title="Reset stock to initial release numbers (6 per size, 0 for XXL)"
+              title="Reset stock to initial release numbers (6 for S/M/L, 0 for XS/XL/XXL)"
             >
               <RotateCcw size={12} />
               <span>Reset Drop Stock</span>

@@ -16,15 +16,25 @@ import { Size, SizeInventory, CartItem, OrderDetails, Colorway } from './types';
 import { Sparkles, Check } from 'lucide-react';
 
 export default function App() {
-  // Current Active Colorway (defaults to Washed Black - Drop 01)
-  const [currentColorway, setCurrentColorway] = useState<Colorway>(COLORWAYS[0]);
+  // Current Active Colorway (defaults to newly updated PWLC 003 White Earth Design)
+  const [currentColorway, setCurrentColorway] = useState<Colorway>(
+    () => COLORWAYS.find((c) => c.id === 'pwlc-003-white-earth') || COLORWAYS[0]
+  );
 
-  // Inventory state with localStorage persistence (for Washed Black Drop 01)
+  // Inventory state with localStorage persistence (strictly 0 stock for XS, XL, XXL)
   const [inventory, setInventory] = useState<SizeInventory[]>(() => {
     try {
-      const saved = localStorage.getItem('pwlc_drop01_inventory');
+      const saved = localStorage.getItem('pwlc_drop01_inventory_v3');
       if (saved) {
-        return JSON.parse(saved);
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed.map((item: SizeInventory) => {
+            if (item.size === 'XS' || item.size === 'XL' || item.size === 'XXL') {
+              return { ...item, stock: 0 };
+            }
+            return item;
+          });
+        }
       }
     } catch {
       // fallback
@@ -68,7 +78,7 @@ export default function App() {
   // Save to localStorage
   useEffect(() => {
     try {
-      localStorage.setItem('pwlc_drop01_inventory', JSON.stringify(inventory));
+      localStorage.setItem('pwlc_drop01_inventory_v3', JSON.stringify(inventory));
     } catch {
       // ignore
     }
@@ -187,6 +197,7 @@ export default function App() {
     setInventory(INITIAL_INVENTORY);
     setCart([]);
     localStorage.removeItem('pwlc_drop01_inventory');
+    localStorage.removeItem('pwlc_drop01_inventory_v3');
     localStorage.removeItem('pwlc_drop01_cart');
   };
 

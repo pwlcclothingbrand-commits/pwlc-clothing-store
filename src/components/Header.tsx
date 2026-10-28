@@ -18,7 +18,7 @@ export const Header: React.FC<HeaderProps> = ({ cartCount, onOpenCart }) => {
           <div className="flex items-center gap-2">
             <span className="text-[#ff1a2b] font-bold">PWLC EARTH SERIES</span>
             <span>·</span>
-            <span className="text-zinc-200">60 AED EACH</span>
+            <span className="text-zinc-200">75 AED EACH</span>
             <span>·</span>
             <span className="hidden sm:inline text-zinc-400">DELIVERY: 15 AED (CLOSE/LOCAL) · 30 AED (STANDARD)</span>
           </div>
