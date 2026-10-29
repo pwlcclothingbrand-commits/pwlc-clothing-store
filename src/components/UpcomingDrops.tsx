@@ -37,8 +37,8 @@ export const UpcomingDrops: React.FC<UpcomingDropsProps> = ({
           </div>
         </div>
 
-        {/* 4 Cards Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* 3 Upcoming Editions Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {comingSoonColorways.map((c) => {
             return (
               <div

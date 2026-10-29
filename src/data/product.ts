@@ -14,15 +14,15 @@ export const COLORWAYS: Colorway[] = [
     id: 'pwlc-001-black-earth',
     name: 'PWLC 001 Black Earth Design',
     colorName: 'Black Earth',
-    hex: '#1c1c1f',
+    hex: '#0d0d0f',
     status: 'available',
     releaseTag: 'PWLC 001 · AVAILABLE NOW (LIMITED DROP)',
     dropNumber: 'PWLC 001',
-    image: '/assets/aistudio/E7D5F1CA-8D3C-4A77-A237-AAA7C1049FF9_7ec0d0b0.png',
+    image: '/assets/pwlc_001_black_earth.jpg',
     price: 75.0,
     description:
-      'PWLC 001 Black Earth Design. Dual-print heavyweight 300 GSM combed compact cotton. Features the scarlet PWLC script on the front chest and the iconic luminous Earth graphic with community manifesto on the back.',
-    washDetails: 'Deep black mineral wash with distressed seam fades and back Earth screenprint',
+      'PWLC 001 Black Earth Design. Dual-print heavyweight 300 GSM combed compact cotton in deep jet black. Features the scarlet PWLC script on the front chest and the iconic luminous Earth graphic with community manifesto on the back.',
+    washDetails: 'Deep jet black finish with contrast scarlet PWLC chest branding and detailed back Earth screenprint',
   },
   {
     id: 'pwlc-002-pink-earth',
@@ -32,7 +32,7 @@ export const COLORWAYS: Colorway[] = [
     status: 'coming_soon',
     releaseTag: 'PWLC 002 · COMING SOON',
     dropNumber: 'PWLC 002',
-    image: '/assets/aistudio/2902FF53-9F04-43C2-BC8E-F49565DFADD3_6c2e1bb0.png',
+    image: '/assets/pwlc_002_pink_earth.png',
     price: 75.0,
     description:
       'PWLC 002 Pink Earth Design. Pigment-dyed and enzyme washed for an organic earthy pink patina, with scarlet PWLC chest script and back Earth community insignia.',
@@ -46,7 +46,7 @@ export const COLORWAYS: Colorway[] = [
     status: 'coming_soon',
     releaseTag: 'PWLC 003 · COMING SOON',
     dropNumber: 'PWLC 003',
-    image: '/assets/aistudio/8868D36A-0480-4E5F-BF42-F6EA04A32757_66027b4d.png',
+    image: '/assets/pwlc_003_white_earth.jpeg',
     price: 75.0,
     description:
       'PWLC 003 White Earth Design. Warm unbleached stone white wash on heavyweight 300 GSM jersey, accented with high-density red PWLC chest insignia and back Earth graphic.',
@@ -60,25 +60,11 @@ export const COLORWAYS: Colorway[] = [
     status: 'coming_soon',
     releaseTag: 'PWLC 004 · COMING SOON',
     dropNumber: 'PWLC 004',
-    image: '/assets/aistudio/B3A446FF-95E4-43EC-B5E2-E59B31566A2A_ab85b10c.jpeg',
+    image: '/assets/pwlc_004_light_blue_earth.jpeg',
     price: 75.0,
     description:
       'PWLC 004 Light Blue Earth Design. Soft mineral glacial wash with weathered highlights and signature red PWLC branding on boxy drop-shoulder cut.',
     washDetails: 'Glacial light blue earth mineral fade with back Earth screenprint',
-  },
-  {
-    id: 'pwlc-005-grey-earth',
-    name: 'PWLC 005 Grey Acid Earth Design',
-    colorName: 'Grey Acid Earth',
-    hex: '#5f6064',
-    status: 'coming_soon',
-    releaseTag: 'PWLC 005 · COMING SOON',
-    dropNumber: 'PWLC 005',
-    image: '/assets/aistudio/E7D5F1CA-8D3C-4A77-A237-AAA7C1049FF9_7ec0d0b0.png',
-    price: 75.0,
-    description:
-      'PWLC 005 Grey Acid Earth Design. Heavy industrial acid marl with textured grain patina, drop shoulders, and vibrant scarlet red chest signature.',
-    washDetails: 'Heavy stone acid marl with textured grain patina',
   },
 ];
 

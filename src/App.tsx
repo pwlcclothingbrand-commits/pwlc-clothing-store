@@ -16,10 +16,8 @@ import { Size, SizeInventory, CartItem, OrderDetails, Colorway } from './types';
 import { Sparkles, Check } from 'lucide-react';
 
 export default function App() {
-  // Current Active Colorway (defaults to newly updated PWLC 003 White Earth Design)
-  const [currentColorway, setCurrentColorway] = useState<Colorway>(
-    () => COLORWAYS.find((c) => c.id === 'pwlc-003-white-earth') || COLORWAYS[0]
-  );
+  // Current Active Colorway (defaults to PWLC 001 Black Earth Design - the only one currently available to buy)
+  const [currentColorway, setCurrentColorway] = useState<Colorway>(() => COLORWAYS[0]);
 
   // Inventory state with localStorage persistence (strictly 0 stock for XS, XL, XXL)
   const [inventory, setInventory] = useState<SizeInventory[]>(() => {
