@@ -5,7 +5,44 @@ import {defineConfig} from 'vite';
 
 export default defineConfig(() => {
   return {
-    plugins: [react(), tailwindcss()],
+    plugins: [
+      react(),
+      tailwindcss(),
+      {
+        name: 'pwlc-api',
+        configureServer(server) {
+          server.middlewares.use('/api/order', (req, res) => {
+            if (req.method === 'POST') {
+              let body = '';
+              req.on('data', (chunk) => {
+                body += chunk;
+              });
+              req.on('end', () => {
+                try {
+                  const data = JSON.parse(body || '{}');
+                  console.log('📦 [PWLC ORDER RECEIVED FOR pwlcclothingbrand@gmail.com]:', data);
+                  res.setHeader('Content-Type', 'application/json');
+                  res.end(
+                    JSON.stringify({
+                      success: true,
+                      target: 'pwlcclothingbrand@gmail.com',
+                      orderId: data.orderId || 'PWLC-ORDER',
+                    })
+                  );
+                } catch {
+                  res.statusCode = 400;
+                  res.setHeader('Content-Type', 'application/json');
+                  res.end(JSON.stringify({ error: 'Invalid order payload' }));
+                }
+              });
+            } else {
+              res.setHeader('Content-Type', 'application/json');
+              res.end(JSON.stringify({ status: 'online', brandEmail: 'pwlcclothingbrand@gmail.com' }));
+            }
+          });
+        },
+      },
+    ],
     resolve: {
       alias: {
         '@': path.resolve(__dirname, '.'),

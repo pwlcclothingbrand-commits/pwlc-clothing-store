@@ -1,6 +1,6 @@
 import React from 'react';
 import { Colorway } from '../types';
-import { Bell, Eye, Clock, Sparkles } from 'lucide-react';
+import { Bell, Eye, Clock, Sparkles, Layers } from 'lucide-react';
 
 interface UpcomingDropsProps {
   comingSoonColorways: Colorway[];
@@ -13,6 +13,11 @@ export const UpcomingDrops: React.FC<UpcomingDropsProps> = ({
   onSelectColorway,
   onOpenRestockModal,
 }) => {
+  // Filter strictly for T-Shirts coming soon (Pink Earth, White Earth, Light Blue Earth - no grey!)
+  const tshirtComingSoon = comingSoonColorways.filter(
+    (c) => c.category === 't-shirt'
+  );
+
   return (
     <section id="upcoming" className="py-20 border-t border-white/5 bg-[#0e0e12]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -21,25 +26,34 @@ export const UpcomingDrops: React.FC<UpcomingDropsProps> = ({
           <div>
             <div className="text-xs font-mono tracking-widest uppercase text-amber-400 font-bold mb-2 flex items-center gap-1.5">
               <Clock size={13} />
-              <span>PWLC EARTH SERIES · COMING SOON</span>
+              <span>CATEGORY: DROP 02 HEAVYWEIGHT TEES · COMING SOON</span>
             </div>
             <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-white font-display">
-              Upcoming Earth Design Editions
+              Upcoming T-Shirt Colorways
             </h2>
-            <p className="mt-3 text-sm text-zinc-400 max-w-xl leading-relaxed">
-              PWLC 002 Pink Earth, PWLC 003 White Earth, and PWLC 004 Light Blue Earth. Each 75 AED with 15 AED local / 30 AED standard delivery. Strictly 6 pieces per size upon release.
+            <p className="mt-3 text-sm text-zinc-400 max-w-2xl leading-relaxed">
+              Drop 02 expands the PWLC heavyweight lineup with <strong>PWLC 002 Pink Earth, PWLC 003 White Earth, and PWLC 004 Light Blue Earth</strong>. Each 75 AED with 15 AED local / 30 AED standard UAE delivery and Cash on Delivery. Strictly limited to 6 shirts per size.
             </p>
           </div>
 
-          <div className="text-xs font-mono text-zinc-500 flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
-            <span>Pre-Registration Roster Open</span>
+          <div className="flex items-center gap-4">
+            <a
+              href="#headwear"
+              className="text-xs font-mono px-3 py-1.5 bg-zinc-900 border border-white/10 hover:border-[#ff1a2b] text-zinc-300 hover:text-white transition-colors flex items-center gap-1.5"
+            >
+              <Layers size={13} className="text-[#ff1a2b]" />
+              <span>Looking for Ski Mask Category? →</span>
+            </a>
+            <div className="text-xs font-mono text-zinc-500 hidden sm:flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+              <span>Pre-Registration Open</span>
+            </div>
           </div>
         </div>
 
-        {/* 3 Upcoming Editions Grid */}
+        {/* 3 Upcoming T-Shirt Editions Grid (Pink Earth, White Earth, Light Blue Earth) */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {comingSoonColorways.map((c) => {
+          {tshirtComingSoon.map((c) => {
             return (
               <div
                 key={c.id}
@@ -110,18 +124,20 @@ export const UpcomingDrops: React.FC<UpcomingDropsProps> = ({
                 {/* Card Actions */}
                 <div className="p-5 pt-0 grid grid-cols-2 gap-2">
                   <button
+                    type="button"
                     onClick={() => {
                       onSelectColorway(c);
                       const target = document.getElementById('product');
                       target?.scrollIntoView({ behavior: 'smooth' });
                     }}
-                    className="py-2.5 px-3 text-[11px] font-semibold uppercase tracking-wider bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-white/10 text-center transition-colors"
+                    className="py-2.5 px-3 text-[11px] font-semibold uppercase tracking-wider bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-white/10 text-center transition-colors cursor-pointer"
                   >
                     View Cut
                   </button>
                   <button
+                    type="button"
                     onClick={() => onOpenRestockModal(c.name)}
-                    className="py-2.5 px-3 text-[11px] font-bold uppercase tracking-wider bg-[#ff1a2b] hover:bg-[#e01424] text-white flex items-center justify-center gap-1 transition-colors"
+                    className="py-2.5 px-3 text-[11px] font-bold uppercase tracking-wider bg-[#ff1a2b] hover:bg-[#e01424] text-white flex items-center justify-center gap-1 transition-colors cursor-pointer"
                   >
                     <Bell size={12} />
                     <span>Drop Alert</span>
@@ -132,7 +148,7 @@ export const UpcomingDrops: React.FC<UpcomingDropsProps> = ({
           })}
         </div>
 
-        {/* Drop 02 Syndicate Note */}
+        {/* Drop 02 Early Access Roster Note */}
         <div className="mt-12 p-6 bg-[#141418] border border-white/5 flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
@@ -140,18 +156,19 @@ export const UpcomingDrops: React.FC<UpcomingDropsProps> = ({
             </div>
             <div>
               <h4 className="text-sm font-bold text-white font-display">
-                Want guaranteed access to Drop 02?
+                Drop 02 Priority Roster
               </h4>
               <p className="text-xs text-zinc-400 mt-0.5">
-                Drop 02 will release with only 6 shirts per size. Pre-registered members receive priority access 30 minutes in advance.
+                Drop 02 releases with only 6 shirts per size. Pre-registered members receive password-protected early checkout.
               </p>
             </div>
           </div>
           <button
-            onClick={() => onOpenRestockModal('Drop 02 All Colorways')}
-            className="px-6 py-2.5 text-xs font-bold uppercase tracking-widest bg-white hover:bg-zinc-200 text-black whitespace-nowrap transition-colors shrink-0"
+            type="button"
+            onClick={() => onOpenRestockModal('Drop 02 T-Shirt Collection')}
+            className="px-6 py-2.5 text-xs font-bold uppercase tracking-widest bg-white hover:bg-zinc-200 text-black whitespace-nowrap transition-colors shrink-0 cursor-pointer"
           >
-            Pre-Register for All 4 Colorways
+            Pre-Register For Drop 02 Tees
           </button>
         </div>
       </div>

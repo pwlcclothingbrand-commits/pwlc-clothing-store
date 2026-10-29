@@ -3,6 +3,7 @@ import { Header } from './components/Header';
 import { ProductViewer } from './components/ProductViewer';
 import { PurchaseModule } from './components/PurchaseModule';
 import { UpcomingDrops } from './components/UpcomingDrops';
+import { HeadwearCategory } from './components/HeadwearCategory';
 import { SizeChartModal } from './components/SizeChartModal';
 import { FitCalculatorModal } from './components/FitCalculatorModal';
 import { RestockModal } from './components/RestockModal';
@@ -10,8 +11,9 @@ import { SpecsSection } from './components/SpecsSection';
 import { BrandStory } from './components/BrandStory';
 import { CartDrawer } from './components/CartDrawer';
 import { CheckoutModal } from './components/CheckoutModal';
+import { StreetwearFeatures } from './components/StreetwearFeatures';
 import { Footer } from './components/Footer';
-import { INITIAL_INVENTORY, COLORWAYS, PRODUCT_DATA } from './data/product';
+import { INITIAL_INVENTORY, COLORWAYS, HEADWEAR_ITEMS, PRODUCT_DATA } from './data/product';
 import { Size, SizeInventory, CartItem, OrderDetails, Colorway } from './types';
 import { Sparkles, Check } from 'lucide-react';
 
@@ -19,16 +21,19 @@ export default function App() {
   // Current Active Colorway (defaults to PWLC 001 Black Earth Design - the only one currently available to buy)
   const [currentColorway, setCurrentColorway] = useState<Colorway>(() => COLORWAYS[0]);
 
-  // Inventory state with localStorage persistence (strictly 0 stock for XS, XL, XXL)
+  // Inventory state with localStorage persistence (XS and XXL = 0 stock; S, M, L, XL = 6 units)
   const [inventory, setInventory] = useState<SizeInventory[]>(() => {
     try {
-      const saved = localStorage.getItem('pwlc_drop01_inventory_v3');
+      const saved = localStorage.getItem('pwlc_drop01_inventory_v4');
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
           return parsed.map((item: SizeInventory) => {
-            if (item.size === 'XS' || item.size === 'XL' || item.size === 'XXL') {
+            if (item.size === 'XS' || item.size === 'XXL') {
               return { ...item, stock: 0 };
+            }
+            if (item.size === 'XL' && (item.stock === 0 || item.stock === undefined)) {
+              return { ...item, stock: 6 };
             }
             return item;
           });
@@ -76,7 +81,7 @@ export default function App() {
   // Save to localStorage
   useEffect(() => {
     try {
-      localStorage.setItem('pwlc_drop01_inventory_v3', JSON.stringify(inventory));
+      localStorage.setItem('pwlc_drop01_inventory_v4', JSON.stringify(inventory));
     } catch {
       // ignore
     }
@@ -96,8 +101,8 @@ export default function App() {
   // Coming Soon colorways list
   const comingSoonColorways = COLORWAYS.filter((c) => c.status === 'coming_soon');
 
-  // Add to Bag handler
-  const handleAddToCart = (colorway: Colorway, size: Size, quantity: number) => {
+  // Direct Order Now handler (replaces Add to Bag and Instant Checkout)
+  const handleOrderNow = (colorway: Colorway, size: Size, quantity: number) => {
     if (colorway.status === 'coming_soon') {
       setRestockModal({ isOpen: true, size, targetName: colorway.name });
       return;
@@ -109,35 +114,24 @@ export default function App() {
       return;
     }
 
-    setCart((prevCart) => {
-      const itemKey = `${colorway.id}-${size}`;
-      const existingIndex = prevCart.findIndex((item) => item.id.startsWith(itemKey));
-      if (existingIndex > -1) {
-        const updated = [...prevCart];
-        const newQty = Math.min(sizeInv.stock, updated[existingIndex].quantity + quantity);
-        updated[existingIndex] = { ...updated[existingIndex], quantity: newQty };
-        return updated;
-      } else {
-        const newItem: CartItem = {
-          id: `${itemKey}-${Date.now()}`,
-          size,
-          quantity: Math.min(sizeInv.stock, quantity),
-          price: colorway.price,
-          title: colorway.name,
-          image: colorway.image,
-        };
-        return [...prevCart, newItem];
-      }
-    });
+    const orderItem: CartItem = {
+      id: `${colorway.id}-${size}-${Date.now()}`,
+      size,
+      quantity,
+      price: colorway.price,
+      title: colorway.name,
+      image: colorway.image,
+    };
 
-    setIsCartOpen(true);
-  };
-
-  // Instant Checkout
-  const handleInstantBuy = (colorway: Colorway, size: Size, quantity: number) => {
-    handleAddToCart(colorway, size, quantity);
+    setCart([orderItem]);
     setIsCartOpen(false);
     setIsCheckoutOpen(true);
+  };
+
+  const handleHeaderOrder = () => {
+    const availableColorway = COLORWAYS.find((c) => c.status === 'available') || COLORWAYS[0];
+    const targetSize = selectedSize === 'OSFA' ? 'M' : selectedSize;
+    handleOrderNow(availableColorway, targetSize, 1);
   };
 
   // Update Bag Item Quantity
@@ -196,13 +190,14 @@ export default function App() {
     setCart([]);
     localStorage.removeItem('pwlc_drop01_inventory');
     localStorage.removeItem('pwlc_drop01_inventory_v3');
+    localStorage.removeItem('pwlc_drop01_inventory_v4');
     localStorage.removeItem('pwlc_drop01_cart');
   };
 
   return (
     <div className="min-h-screen bg-[#0b0b0d] text-white flex flex-col selection:bg-[#ff1a2b] selection:text-white">
       {/* Top Bar Navigation */}
-      <Header cartCount={cartCount} onOpenCart={() => setIsCartOpen(true)} />
+      <Header cartCount={cartCount} onOpenCart={handleHeaderOrder} />
 
       {/* Main Product Showcase Section */}
       <main id="product" className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-16 w-full">
@@ -223,8 +218,7 @@ export default function App() {
               inventory={inventory}
               selectedSize={selectedSize}
               onSelectSize={setSelectedSize}
-              onAddToCart={handleAddToCart}
-              onInstantBuy={handleInstantBuy}
+              onOrderNow={handleOrderNow}
               onOpenSizeChart={() => setIsSizeChartOpen(true)}
               onOpenFitCalculator={() => setIsFitCalculatorOpen(true)}
               onOpenRestockModal={(size, colorwayName) =>
@@ -238,22 +232,45 @@ export default function App() {
           </div>
         </div>
 
-        {/* Dedicated Upcoming Drops Section (Drop 02 Coming Soon) */}
-        <UpcomingDrops
-          comingSoonColorways={comingSoonColorways}
-          onSelectColorway={(colorway) => {
-            setCurrentColorway(colorway);
+        {/* Dedicated Headwear & Ski Mask Category Showcase Section */}
+        <HeadwearCategory
+          onSelectHeadwear={(mask) => {
+            setCurrentColorway(mask);
+            setSelectedSize('OSFA');
             const target = document.getElementById('product');
             target?.scrollIntoView({ behavior: 'smooth' });
           }}
           onOpenRestockModal={(colorwayName) =>
             setRestockModal({
               isOpen: true,
-              size: selectedSize,
+              size: 'OSFA',
               targetName: colorwayName,
             })
           }
         />
+
+        {/* Dedicated Upcoming Drops Section (Drop 02 T-Shirt Colorways) */}
+        <UpcomingDrops
+          comingSoonColorways={comingSoonColorways}
+          onSelectColorway={(colorway) => {
+            setCurrentColorway(colorway);
+            if (colorway.category === 't-shirt' && selectedSize === 'OSFA') {
+              setSelectedSize('M');
+            }
+            const target = document.getElementById('product');
+            target?.scrollIntoView({ behavior: 'smooth' });
+          }}
+          onOpenRestockModal={(colorwayName) =>
+            setRestockModal({
+              isOpen: true,
+              size: selectedSize === 'OSFA' ? 'M' : selectedSize,
+              targetName: colorwayName,
+            })
+          }
+        />
+
+        {/* Live UAE Express Dispatch, Cash on Delivery, Tech Specs & Verified Drop Reviews */}
+        <StreetwearFeatures onOrderNow={handleHeaderOrder} />
 
         {/* Inline Size & Measurements Table Anchor */}
         <div id="sizing" className="mt-24 pt-16 border-t border-white/5">

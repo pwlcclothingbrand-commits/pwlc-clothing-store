@@ -18,7 +18,7 @@ export const Header: React.FC<HeaderProps> = ({ cartCount, onOpenCart }) => {
           <div className="flex items-center gap-2">
             <span className="text-[#ff1a2b] font-bold">PWLC EARTH SERIES</span>
             <span>·</span>
-            <span className="text-zinc-200">75 AED EACH</span>
+            <span className="text-zinc-200">TEES 75 AED · SKI MASK 35 AED</span>
             <span>·</span>
             <span className="hidden sm:inline text-zinc-400">DELIVERY: 15 AED (CLOSE/LOCAL) · 30 AED (STANDARD)</span>
           </div>
@@ -44,19 +44,25 @@ export const Header: React.FC<HeaderProps> = ({ cartCount, onOpenCart }) => {
         </a>
 
         {/* Zone 2: clean single-line nav links */}
-        <nav className="hidden md:flex items-center gap-7 text-xs font-semibold tracking-widest uppercase text-zinc-400">
+        <nav className="hidden md:flex items-center gap-6 text-xs font-semibold tracking-widest uppercase text-zinc-400">
           <a
             href="#product"
             className="hover:text-white transition-colors whitespace-nowrap shrink-0 hover:underline underline-offset-8 decoration-[#ff1a2b]"
           >
-            Drop 01 (Live)
+            T-Shirts (Live)
+          </a>
+          <a
+            href="#headwear"
+            className="text-zinc-200 hover:text-white transition-colors whitespace-nowrap shrink-0 hover:underline underline-offset-8 decoration-[#ff1a2b] flex items-center gap-1.5"
+          >
+            <span>Ski Mask (Headwear)</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-[#ff1a2b]" />
           </a>
           <a
             href="#upcoming"
-            className="text-zinc-200 hover:text-white transition-colors whitespace-nowrap shrink-0 hover:underline underline-offset-8 decoration-[#ff1a2b] flex items-center gap-1.5"
+            className="text-zinc-400 hover:text-white transition-colors whitespace-nowrap shrink-0 hover:underline underline-offset-8 decoration-[#ff1a2b]"
           >
-            <span>Drop 02 (Coming Soon)</span>
-            <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+            Drop 02 Tees
           </a>
           <a
             href="#craftsmanship"
@@ -76,14 +82,11 @@ export const Header: React.FC<HeaderProps> = ({ cartCount, onOpenCart }) => {
         <div className="flex items-center gap-3 shrink-0">
           <button
             onClick={onOpenCart}
-            className="flex items-center gap-2.5 px-4 py-2 text-xs font-semibold tracking-wider uppercase text-white bg-zinc-900 hover:bg-zinc-800 border border-white/10 rounded-none transition-colors whitespace-nowrap shrink-0 group active:scale-[0.98]"
-            aria-label="Open Shopping Bag"
+            className="flex items-center gap-2 px-4 py-2 text-xs font-bold tracking-wider uppercase text-white bg-[#ff1a2b] hover:bg-[#e01424] transition-colors whitespace-nowrap shrink-0 group active:scale-[0.98] cursor-pointer shadow-md shadow-red-600/20"
+            aria-label="Order PWLC 001 Now"
           >
-            <ShoppingBag size={14} className="text-zinc-400 group-hover:text-[#ff1a2b] transition-colors" />
-            <span>Bag</span>
-            <span className="tabular-nums font-mono text-[11px] px-1.5 py-0.2 bg-[#ff1a2b] text-white font-bold">
-              {cartCount}
-            </span>
+            <ShoppingBag size={14} className="text-white" />
+            <span>Order Now</span>
           </button>
         </div>
       </div>

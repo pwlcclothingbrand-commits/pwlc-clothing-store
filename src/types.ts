@@ -1,4 +1,6 @@
-export type Size = 'XS' | 'S' | 'M' | 'L' | 'XL' | 'XXL';
+export type Size = 'XS' | 'S' | 'M' | 'L' | 'XL' | 'XXL' | 'OSFA';
+
+export type ProductCategory = 't-shirt' | 'headwear';
 
 export interface SizeInventory {
   size: Size;
@@ -8,6 +10,8 @@ export interface SizeInventory {
 
 export interface Colorway {
   id: string;
+  category: ProductCategory;
+  categoryName: string;
   name: string;
   colorName: string;
   hex: string;
@@ -18,6 +22,8 @@ export interface Colorway {
   price: number;
   description: string;
   washDetails: string;
+  specs?: string[];
+  sizeType?: 'standard' | 'one-size';
 }
 
 export interface CartItem {
@@ -29,6 +35,17 @@ export interface CartItem {
   image: string;
 }
 
+export interface OrderCustomer {
+  fullName: string;
+  email: string;
+  phone: string;
+  address: string;
+  city: string;
+  postalCode?: string;
+  country: string;
+  notes?: string;
+}
+
 export interface OrderDetails {
   orderId: string;
   items: CartItem[];
@@ -36,14 +53,7 @@ export interface OrderDetails {
   shipping: number;
   discount: number;
   total: number;
-  customer: {
-    fullName: string;
-    email: string;
-    address: string;
-    city: string;
-    postalCode: string;
-    country: string;
-  };
+  customer: OrderCustomer;
   paymentMethod: string;
   createdAt: string;
   estimatedDelivery: string;

@@ -24,7 +24,10 @@ export const RestockModal: React.FC<RestockModalProps> = ({
     targetName?.includes('Drop 02') ||
     targetName?.includes('Pink') ||
     targetName?.includes('Blue') ||
-    targetName?.includes('Grey') ||
+    targetName?.includes('White') ||
+    targetName?.includes('Balaclava') ||
+    targetName?.includes('Ski Mask') ||
+    targetName?.includes('Headwear') ||
     targetName?.includes('Stone');
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -86,8 +89,8 @@ export const RestockModal: React.FC<RestockModalProps> = ({
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="pwlcclothingbrand@gmail.com"
-                  className="w-full bg-zinc-900 border border-white/10 px-3.5 py-2.5 text-xs text-white placeholder-zinc-600 focus:outline-none focus:border-[#ff1a2b]"
+                  placeholder="e.g. yourname@gmail.com"
+                  className="w-full bg-zinc-900 border border-white/10 px-3.5 py-2.5 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-[#ff1a2b]"
                 />
               </div>
 
