@@ -30,9 +30,31 @@ export const RestockModal: React.FC<RestockModalProps> = ({
     targetName?.includes('Headwear') ||
     targetName?.includes('Stone');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const BRAND_GMAIL = 'pwlcclothingbrand@gmail.com';
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) return;
+
+    // Send email alert directly to pwlcclothingbrand@gmail.com
+    try {
+      fetch(`https://formsubmit.co/ajax/${BRAND_GMAIL}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({
+          _subject: `🔔 NEW PWLC ROSTER SIGNUP: ${targetName || (size ? `Size ${size}` : 'Release')} - ${email}`,
+          _captcha: 'false',
+          type: isComingSoonDrop ? 'Drop 02 Early Access Roster' : 'Sold Out Restock Request',
+          target_product: targetName || 'Drop 01 Item',
+          target_size: size || 'OSFA',
+          customer_email: email,
+          timestamp: new Date().toLocaleString('en-US', { timeZone: 'Asia/Dubai' }) + ' (Dubai GST)',
+        }),
+      }).catch(() => {});
+    } catch {
+      // ignore
+    }
+
     setSubmitted(true);
   };
 

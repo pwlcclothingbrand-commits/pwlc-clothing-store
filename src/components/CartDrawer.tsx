@@ -76,8 +76,13 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
           <div className="px-6 py-2.5 bg-[#18181c] border-b border-white/5 text-xs flex items-center justify-between">
             <div className="flex items-center gap-2 text-zinc-300">
               <Truck size={14} className="text-[#ff1a2b]" />
-              <span>Flat Delivery: <strong>15 AED</strong> close · <strong>30 AED</strong> standard</span>
+              <span>
+                <strong className="text-white">Dubai Only:</strong> 15 AED Central · 30 AED Outer Dubai
+              </span>
             </div>
+            <span className="text-[10px] font-mono text-[#ff1a2b] bg-[#ff1a2b]/10 px-1.5 py-0.5 border border-[#ff1a2b]/30 uppercase">
+              Dubai Only
+            </span>
           </div>
 
           {/* Cart Items List */}
@@ -172,34 +177,37 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
           {/* Footer & Checkout Area */}
           {items.length > 0 && (
             <div className="p-6 border-t border-white/10 bg-[#0e0e11] space-y-4">
-              {/* Delivery Zone Selector */}
+              {/* Dubai Delivery Zone Selector */}
               <div>
-                <label className="block text-zinc-400 uppercase tracking-wider text-[10px] font-semibold mb-1.5">
-                  Delivery Distance / Location
-                </label>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block text-zinc-400 uppercase tracking-wider text-[10px] font-semibold">
+                    Dubai Delivery Zone
+                  </label>
+                  <span className="text-[10px] text-[#ff1a2b] font-mono">Dubai Dispatch Only</span>
+                </div>
                 <div className="grid grid-cols-2 gap-2 text-xs">
                   <button
                     type="button"
                     onClick={() => setDeliveryType('close')}
-                    className={`p-2 border text-left transition-colors ${
+                    className={`p-2 border text-left transition-colors cursor-pointer ${
                       deliveryType === 'close'
                         ? 'border-[#ff1a2b] bg-white/5 text-white'
                         : 'border-white/10 bg-zinc-900/60 text-zinc-400 hover:border-zinc-700'
                     }`}
                   >
-                    <div className="font-semibold text-[11px] text-white">Close / Nearby</div>
+                    <div className="font-semibold text-[11px] text-white">Central Dubai</div>
                     <div className="text-[10px] text-zinc-400 font-mono mt-0.5">15.00 AED</div>
                   </button>
                   <button
                     type="button"
                     onClick={() => setDeliveryType('standard')}
-                    className={`p-2 border text-left transition-colors ${
+                    className={`p-2 border text-left transition-colors cursor-pointer ${
                       deliveryType === 'standard'
                         ? 'border-[#ff1a2b] bg-white/5 text-white'
                         : 'border-white/10 bg-zinc-900/60 text-zinc-400 hover:border-zinc-700'
                     }`}
                   >
-                    <div className="font-semibold text-[11px] text-white">Standard Delivery</div>
+                    <div className="font-semibold text-[11px] text-white">Outer Dubai</div>
                     <div className="text-[10px] text-zinc-400 font-mono mt-0.5">30.00 AED</div>
                   </button>
                 </div>
@@ -218,7 +226,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                     />
                     <button
                       type="submit"
-                      className="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-xs font-semibold uppercase tracking-wider text-white border border-white/10"
+                      className="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-xs font-semibold uppercase tracking-wider text-white border border-white/10 cursor-pointer"
                     >
                       Apply
                     </button>
@@ -231,7 +239,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                     </span>
                     <button
                       onClick={() => setAppliedPromo(null)}
-                      className="text-zinc-400 hover:text-white text-[11px] underline"
+                      className="text-zinc-400 hover:text-white text-[11px] underline cursor-pointer"
                     >
                       Remove
                     </button>
@@ -245,7 +253,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
               {/* Financial Calculation */}
               <div className="space-y-1.5 text-xs text-zinc-400 font-mono">
                 <div className="flex justify-between">
-                  <span>Subtotal ({items.reduce((acc, i) => acc + i.quantity, 0)} shirts @ 60 AED)</span>
+                  <span>Subtotal ({items.reduce((acc, i) => acc + i.quantity, 0)} items)</span>
                   <span className="text-white">{subtotal.toFixed(2)} AED</span>
                 </div>
                 {discountAmount > 0 && (
@@ -255,7 +263,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                   </div>
                 )}
                 <div className="flex justify-between">
-                  <span>Delivery ({deliveryType === 'close' ? 'Close Area' : 'Standard Area'})</span>
+                  <span>Dubai Delivery ({deliveryType === 'close' ? 'Central Dubai' : 'Outer Dubai'})</span>
                   <span>{shippingAmount.toFixed(2)} AED</span>
                 </div>
                 <div className="flex justify-between pt-2 border-t border-white/10 text-sm font-bold text-white font-sans">

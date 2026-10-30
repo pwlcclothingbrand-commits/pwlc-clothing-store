@@ -11,6 +11,7 @@ import { SpecsSection } from './components/SpecsSection';
 import { BrandStory } from './components/BrandStory';
 import { CartDrawer } from './components/CartDrawer';
 import { CheckoutModal } from './components/CheckoutModal';
+import { BrandOrdersModal } from './components/BrandOrdersModal';
 import { StreetwearFeatures } from './components/StreetwearFeatures';
 import { Footer } from './components/Footer';
 import { INITIAL_INVENTORY, COLORWAYS, HEADWEAR_ITEMS, PRODUCT_DATA } from './data/product';
@@ -69,11 +70,41 @@ export default function App() {
     isOpen: false,
   });
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  const [isOrdersModalOpen, setIsOrdersModalOpen] = useState(false);
+  const [ordersCount, setOrdersCount] = useState(1);
   const [checkoutDiscount, setCheckoutDiscount] = useState<{ amount: number; code: string }>({
     amount: 0,
     code: '',
   });
   const [checkoutDeliveryType, setCheckoutDeliveryType] = useState<'close' | 'standard'>('close');
+
+  const refreshOrdersCount = async () => {
+    let count = 0;
+    try {
+      const res = await fetch('/api/order');
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data.recentOrders)) {
+          count = data.recentOrders.length;
+        }
+      }
+    } catch {
+      // fallback
+    }
+    try {
+      const local = JSON.parse(localStorage.getItem('pwlc_store_orders') || '[]');
+      if (Array.isArray(local) && local.length > count) {
+        count = local.length;
+      }
+    } catch {
+      // ignore
+    }
+    setOrdersCount(Math.max(count, 1));
+  };
+
+  useEffect(() => {
+    refreshOrdersCount();
+  }, []);
 
   // Inline sizing unit for the sizing section
   const [inlineUnit, setInlineUnit] = useState<'inches' | 'cm'>('inches');
@@ -182,6 +213,7 @@ export default function App() {
     );
     // Clear the cart
     setCart([]);
+    refreshOrdersCount();
   };
 
   // Reset Inventory (for testing & owner verification)
@@ -197,7 +229,12 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#0b0b0d] text-white flex flex-col selection:bg-[#ff1a2b] selection:text-white">
       {/* Top Bar Navigation */}
-      <Header cartCount={cartCount} onOpenCart={handleHeaderOrder} />
+      <Header
+        cartCount={cartCount}
+        onOpenCart={handleHeaderOrder}
+        ordersCount={ordersCount}
+        onOpenOrders={() => setIsOrdersModalOpen(true)}
+      />
 
       {/* Main Product Showcase Section */}
       <main id="product" className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-16 w-full">
@@ -410,7 +447,10 @@ export default function App() {
       <BrandStory />
 
       {/* Footer */}
-      <Footer onResetInventory={handleResetInventory} />
+      <Footer
+        onResetInventory={handleResetInventory}
+        onOpenOrders={() => setIsOrdersModalOpen(true)}
+      />
 
       {/* Drawers & Modals */}
       <CartDrawer
@@ -451,6 +491,11 @@ export default function App() {
         promoCode={checkoutDiscount.code}
         initialDeliveryType={checkoutDeliveryType}
         onCompleteOrder={handleCompleteOrder}
+      />
+
+      <BrandOrdersModal
+        isOpen={isOrdersModalOpen}
+        onClose={() => setIsOrdersModalOpen(false)}
       />
     </div>
   );

@@ -125,7 +125,7 @@ export const HeadwearCategory: React.FC<HeadwearCategoryProps> = ({
                     <span>Cash on Delivery (COD) Enabled</span>
                   </div>
                   <div className="text-[11px] text-zinc-400">
-                    UAE Delivery: 15 AED (Local) · 30 AED (Standard)
+                    Dubai Delivery: 15 AED Central · 30 AED Outer
                   </div>
                 </div>
               </div>

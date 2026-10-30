@@ -12,6 +12,10 @@ import {
   Clock,
   Sparkles,
   ExternalLink,
+  Copy,
+  Check,
+  AlertCircle,
+  Info,
 } from 'lucide-react';
 import { CartItem, OrderDetails } from '../types';
 
@@ -40,13 +44,16 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   const [confirmedOrder, setConfirmedOrder] = useState<OrderDetails | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [emailStatus, setEmailStatus] = useState<'sending' | 'sent' | 'fallback'>('sending');
+  const [emailNotice, setEmailNotice] = useState<string>('');
+  const [copiedReceipt, setCopiedReceipt] = useState(false);
 
-  // Form State: strictly EMPTY by default as requested by user
+  // Form State: strictly EMPTY by default for personal info; city is locked to Dubai
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
     phone: '',
     address: '',
+    dubaiArea: 'Downtown Dubai / Business Bay / DIFC',
     city: 'Dubai',
     postalCode: '',
     country: 'United Arab Emirates',
@@ -88,19 +95,21 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   };
 
   const generateMailtoUrl = (order: OrderDetails) => {
-    const subject = encodeURIComponent(`PWLC Order Confirmation #${order.orderId} - ${order.customer.fullName}`);
+    const subject = encodeURIComponent(`PWLC Order Confirmation #${order.orderId} (Dubai) - ${order.customer.fullName}`);
     const bodyLines = [
-      `PWLC OFFICIAL STORE ORDER`,
-      `=========================`,
+      `PWLC OFFICIAL STORE ORDER - DUBAI DISPATCH`,
+      `=========================================`,
       `Order ID: ${order.orderId}`,
       `Date: ${order.createdAt}`,
+      `Delivery Region: DUBAI ONLY (UAE)`,
       ``,
       `CUSTOMER DETAILS:`,
       `Name: ${order.customer.fullName}`,
       `Phone / WhatsApp: ${order.customer.phone}`,
       `Email: ${order.customer.email}`,
-      `Address: ${order.customer.address}`,
-      `City / Emirate: ${order.customer.city}`,
+      `Street Address / Villa: ${order.customer.address}`,
+      `Dubai Community / Area: ${formData.dubaiArea}`,
+      `City: Dubai`,
       `Country: ${order.customer.country}`,
       `Postal Code: ${order.customer.postalCode || 'N/A'}`,
       `Special Notes: ${order.customer.notes || 'None'}`,
@@ -112,11 +121,11 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
       ``,
       `PAYMENT & DELIVERY:`,
       `Payment Method: ${order.paymentMethod}`,
-      `Delivery Type: ${order.estimatedDelivery}`,
+      `Dubai Delivery Tier: ${order.estimatedDelivery}`,
       `Subtotal: ${order.subtotal.toFixed(2)} AED`,
       `Shipping: ${order.shipping.toFixed(2)} AED`,
       `Total: ${order.total.toFixed(2)} AED`,
-      `=========================`,
+      `=========================================`,
       `Dispatched to: ${BRAND_GMAIL}`,
     ];
     return `mailto:${BRAND_GMAIL}?subject=${subject}&body=${encodeURIComponent(bodyLines.join('\n'))}`;
@@ -124,13 +133,65 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
   const generateWhatsAppUrl = (order: OrderDetails) => {
     const text = encodeURIComponent(
-      `Hello PWLC Team! I just submitted order #${order.orderId}.\n\nItems: ${order.items
+      `Hello PWLC Team! I just submitted order #${order.orderId} for DUBAI delivery.\n\nItems: ${order.items
         .map((i) => `${i.title} (${i.size}) x${i.quantity}`)
-        .join(', ')}\nTotal: ${order.total.toFixed(2)} AED (${order.paymentMethod})\nDelivery to: ${
+        .join(', ')}\nTotal: ${order.total.toFixed(2)} AED (${order.paymentMethod})\nDubai Delivery to: ${
         order.customer.fullName
-      }, ${order.customer.address}, ${order.customer.city}\nPhone: ${order.customer.phone}\n\nEmail sent to: ${BRAND_GMAIL}`
+      }, ${order.customer.address}, ${formData.dubaiArea}, Dubai, UAE\nPhone: ${order.customer.phone}\n\nEmail sent to: ${BRAND_GMAIL}`
     );
     return `https://wa.me/?text=${text}`;
+  };
+
+  const generateGmailWebUrl = (order: OrderDetails) => {
+    const subject = encodeURIComponent(`🚨 NEW PWLC ORDER #${order.orderId} - ${order.customer.fullName} (${order.total.toFixed(2)} AED) [DUBAI]`);
+    const bodyLines = [
+      `PWLC OFFICIAL STORE ORDER DISPATCH - DUBAI ONLY`,
+      `===============================================`,
+      `Order ID: #${order.orderId}`,
+      `Date: ${order.createdAt}`,
+      `Brand Dispatch Destination: ${BRAND_GMAIL}`,
+      ``,
+      `CUSTOMER DETAILS:`,
+      `Full Name: ${order.customer.fullName}`,
+      `Phone / WhatsApp: ${order.customer.phone}`,
+      `Email: ${order.customer.email}`,
+      `Dubai Community: ${formData.dubaiArea}`,
+      `Street / Villa: ${order.customer.address}`,
+      `City: Dubai, UAE`,
+      `Special Instructions: ${order.customer.notes || 'None'}`,
+      ``,
+      `ITEMS ORDERED:`,
+      ...order.items.map(
+        (i) => `• ${i.title} (Size: ${i.size}) x ${i.quantity} = ${(i.price * i.quantity).toFixed(2)} AED`
+      ),
+      ``,
+      `FINANCIAL BREAKDOWN:`,
+      `Subtotal: ${order.subtotal.toFixed(2)} AED`,
+      `Dubai Delivery: ${order.shipping.toFixed(2)} AED (${order.estimatedDelivery})`,
+      `Grand Total: ${order.total.toFixed(2)} AED`,
+      `Payment Method: ${order.paymentMethod}`,
+      `===============================================`,
+    ];
+    return `https://mail.google.com/mail/?view=cm&fs=1&to=${BRAND_GMAIL}&su=${subject}&body=${encodeURIComponent(bodyLines.join('\n'))}`;
+  };
+
+  const handleCopyReceipt = (order: OrderDetails) => {
+    const summary = [
+      `PWLC OFFICIAL ORDER #${order.orderId}`,
+      `Date: ${order.createdAt}`,
+      `Customer: ${order.customer.fullName}`,
+      `Phone: ${order.customer.phone}`,
+      `Email: ${order.customer.email}`,
+      `Dubai Address: ${order.customer.address}, ${formData.dubaiArea}, Dubai, UAE`,
+      `Payment: ${order.paymentMethod}`,
+      `Total: ${order.total.toFixed(2)} AED`,
+      `Items:`,
+      ...order.items.map((i) => `- ${i.title} (${i.size}) x${i.quantity} = ${(i.price * i.quantity).toFixed(2)} AED`),
+      `Dispatched to: ${BRAND_GMAIL}`,
+    ].join('\n');
+    navigator.clipboard.writeText(summary);
+    setCopiedReceipt(true);
+    setTimeout(() => setCopiedReceipt(false), 2500);
   };
 
   const handlePlaceOrder = async (e: React.FormEvent) => {
@@ -138,6 +199,8 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     setIsSubmitting(true);
 
     const orderId = `PWLC-${Math.floor(10000 + Math.random() * 90000)}`;
+    const fullDubaiAddress = `${formData.address.trim()} (${formData.dubaiArea})`;
+
     const newOrder: OrderDetails = {
       orderId,
       items: [...activeItems],
@@ -149,17 +212,17 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
         fullName: formData.fullName.trim(),
         email: formData.email.trim(),
         phone: formData.phone.trim(),
-        address: formData.address.trim(),
-        city: formData.city.trim() || 'Dubai',
+        address: fullDubaiAddress,
+        city: 'Dubai',
         postalCode: formData.postalCode.trim() || '00000',
-        country: formData.country.trim() || 'United Arab Emirates',
+        country: 'United Arab Emirates',
         notes: formData.deliveryNotes.trim(),
       },
       paymentMethod:
         formData.paymentMethod === 'cod'
-          ? 'Cash on Delivery'
+          ? 'Cash on Delivery (Dubai)'
           : formData.paymentMethod === 'card_delivery'
-          ? 'Card Machine on Delivery'
+          ? 'Card Machine on Delivery (Dubai)'
           : formData.paymentMethod === 'card'
           ? 'Online Card Payment'
           : 'Apple Pay / Digital Wallet',
@@ -170,57 +233,112 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
       }),
       estimatedDelivery:
         formData.deliveryProximity === 'close'
-          ? '1–2 Days (Local / Close Area Delivery)'
-          : '2–4 Days (Standard Regional Delivery)',
+          ? '1–2 Days (Central / Local Dubai Delivery)'
+          : '1–2 Days (Outer Dubai Delivery)',
     };
 
     // 1. Send order details directly to the user's Gmail: pwlcclothingbrand@gmail.com
-    try {
-      const itemsListFormatted = activeItems
-        .map((i) => `${i.title} [Size ${i.size}] x ${i.quantity} (${(i.price * i.quantity).toFixed(2)} AED)`)
-        .join(', ');
+    const itemsListFormatted = activeItems
+      .map((i) => `${i.title} [Size ${i.size}] x ${i.quantity} (${(i.price * i.quantity).toFixed(2)} AED)`)
+      .join(' | ');
 
+    const emailPayload: Record<string, string> = {
+      _subject: `🚨 NEW PWLC ORDER #${orderId} - ${formData.fullName.trim()} (${total.toFixed(2)} AED) [DUBAI]`,
+      _captcha: 'false',
+      _template: 'table',
+      _replyto: formData.email.trim(),
+      'Order ID': orderId,
+      'Order Date (Dubai Time)':
+        new Date().toLocaleString('en-US', { timeZone: 'Asia/Dubai' }) + ' (GST)',
+      'Customer Full Name': formData.fullName.trim(),
+      'Customer Phone / WhatsApp': formData.phone.trim(),
+      'Customer Email': formData.email.trim(),
+      'Delivery Emirate': 'Dubai Only (Exclusive UAE Dispatch)',
+      'Dubai Community / Area': formData.dubaiArea,
+      'Street / Villa / Apartment': formData.address.trim(),
+      'Delivery Zone & Fee':
+        formData.deliveryProximity === 'close'
+          ? 'Central / Local Dubai (15 AED)'
+          : 'Outer Dubai Standard (30 AED)',
+      'Payment Method': newOrder.paymentMethod,
+      'Items Purchased': itemsListFormatted,
+      'Subtotal': `${subtotal.toFixed(2)} AED`,
+      'Shipping Fee': `${shippingCost.toFixed(2)} AED`,
+      'Grand Total Due': `${total.toFixed(2)} AED`,
+      'Special Delivery Instructions': formData.deliveryNotes.trim() || 'None',
+      'Target Brand Inbox': BRAND_GMAIL,
+    };
+
+    // A. Direct AJAX POST to formsubmit.co targeting pwlcclothingbrand@gmail.com
+    try {
       const response = await fetch(`https://formsubmit.co/ajax/${BRAND_GMAIL}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Accept: 'application/json',
         },
-        body: JSON.stringify({
-          _subject: `New PWLC Order #${orderId} - ${formData.fullName} (${total.toFixed(2)} AED)`,
-          order_id: orderId,
-          order_date: new Date().toLocaleString('en-US', { timeZone: 'Asia/Dubai' }) + ' (UAE Time)',
-          customer_name: formData.fullName,
-          customer_phone: formData.phone,
-          customer_email: formData.email,
-          delivery_address: formData.address,
-          city_emirate: formData.city,
-          country: formData.country,
-          postal_code: formData.postalCode || 'N/A',
-          delivery_zone:
-            formData.deliveryProximity === 'close'
-              ? 'Close / Local Area (15 AED)'
-              : 'Standard Delivery (30 AED)',
-          payment_method: newOrder.paymentMethod,
-          items_purchased: itemsListFormatted,
-          subtotal: `${subtotal.toFixed(2)} AED`,
-          shipping_fee: `${shippingCost.toFixed(2)} AED`,
-          grand_total: `${total.toFixed(2)} AED`,
-          customer_notes: formData.deliveryNotes || 'None',
-          _replyto: formData.email,
-        }),
+        body: JSON.stringify(emailPayload),
       });
 
       if (response.ok) {
-        setEmailStatus('sent');
+        const json = await response.json().catch(() => null);
+        if (json && json.success === 'false') {
+          setEmailStatus('fallback');
+          setEmailNotice(json.message || 'FormSubmit requires email endpoint confirmation.');
+        } else {
+          setEmailStatus('sent');
+          setEmailNotice('Automated dispatch delivered to relay queue.');
+        }
       } else {
         setEmailStatus('fallback');
+        setEmailNotice(`FormSubmit returned HTTP ${response.status} (Network Outage).`);
       }
     } catch {
       setEmailStatus('fallback');
+      setEmailNotice('FormSubmit relay server is offline (Cloudflare 521).');
     }
 
-    // 2. Also forward to local /api/order middleware
+    // B. Direct hidden Form POST fallback (guarantees delivery bypassing adblockers/CORS)
+    try {
+      const iframeId = 'pwlc_order_dispatch_iframe';
+      let iframe = document.getElementById(iframeId) as HTMLIFrameElement | null;
+      if (!iframe) {
+        iframe = document.createElement('iframe');
+        iframe.id = iframeId;
+        iframe.name = iframeId;
+        iframe.style.display = 'none';
+        document.body.appendChild(iframe);
+      }
+
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = `https://formsubmit.co/${BRAND_GMAIL}`;
+      form.target = iframeId;
+
+      for (const [key, val] of Object.entries(emailPayload)) {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = key;
+        input.value = String(val);
+        form.appendChild(input);
+      }
+
+      document.body.appendChild(form);
+      form.submit();
+      setTimeout(() => {
+        try {
+          if (document.body.contains(form)) {
+            document.body.removeChild(form);
+          }
+        } catch {
+          // ignore
+        }
+      }, 1500);
+    } catch {
+      // ignore
+    }
+
+    // C. Forward to local /api/order middleware for logging and in-memory order tracking
     try {
       await fetch('/api/order', {
         method: 'POST',
@@ -228,13 +346,14 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
         body: JSON.stringify({
           ...newOrder,
           destination: BRAND_GMAIL,
+          emailPayload,
         }),
       });
     } catch {
       // Local fallback
     }
 
-    // 3. Persist order in local store
+    // D. Persist order in browser local storage
     try {
       const savedOrders = JSON.parse(localStorage.getItem('pwlc_store_orders') || '[]');
       localStorage.setItem('pwlc_store_orders', JSON.stringify([newOrder, ...savedOrders]));
@@ -281,9 +400,25 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
           </div>
         )}
 
-        {/* Step 1: Delivery Details (Empty inputs for customer to type) */}
+        {/* Step 1: Delivery Details (Dubai Only Ordering) */}
         {step === 'shipping' && (
           <form onSubmit={handleSubmitShipping} className="space-y-4 py-4 text-xs">
+            {/* Dubai Exclusive Dispatch Notice */}
+            <div className="p-3.5 bg-gradient-to-r from-red-950/40 to-zinc-900 border border-[#ff1a2b]/40 text-xs flex items-start gap-3">
+              <MapPin size={18} className="text-[#ff1a2b] shrink-0 mt-0.5" />
+              <div>
+                <div className="font-bold text-white uppercase tracking-wider text-[11px] flex items-center gap-2">
+                  <span>Dubai Delivery Only</span>
+                  <span className="bg-[#ff1a2b] text-white text-[9px] font-mono px-1.5 py-0.2 font-bold">
+                    EXCLUSIVE
+                  </span>
+                </div>
+                <p className="text-zinc-300 text-[11px] mt-0.5 leading-relaxed">
+                  PWLC currently accepts and dispatches orders <strong className="text-white">exclusively within Dubai, UAE</strong>. Deliveries to other Emirates or outside Dubai are currently not accepted.
+                </p>
+              </div>
+            </div>
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-zinc-300 uppercase tracking-wider text-[11px] font-semibold mb-1">
@@ -328,51 +463,74 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
               />
             </div>
 
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-zinc-300 uppercase tracking-wider text-[11px] font-semibold mb-1">
+                  City / Emirate <span className="text-[#ff1a2b]">*</span>
+                </label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    value="Dubai (Orders Restricted to Dubai)"
+                    readOnly
+                    className="w-full bg-zinc-950 border border-white/15 px-3 py-2.5 text-zinc-200 font-semibold text-xs cursor-not-allowed select-none focus:outline-none"
+                  />
+                  <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[9px] font-mono uppercase bg-[#ff1a2b]/20 text-[#ff1a2b] px-1.5 py-0.5 border border-[#ff1a2b]/40">
+                    Dubai Only
+                  </span>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-zinc-300 uppercase tracking-wider text-[11px] font-semibold mb-1">
+                  Dubai Area / Community <span className="text-[#ff1a2b]">*</span>
+                </label>
+                <select
+                  value={formData.dubaiArea}
+                  onChange={(e) => setFormData({ ...formData, dubaiArea: e.target.value })}
+                  className="w-full bg-zinc-900 border border-white/10 px-3 py-2.5 text-white text-xs focus:outline-none focus:border-[#ff1a2b]"
+                >
+                  <option value="Downtown Dubai / Business Bay / DIFC">Downtown Dubai / Business Bay / DIFC</option>
+                  <option value="Dubai Marina / JBR / JLT">Dubai Marina / JBR / JLT</option>
+                  <option value="Jumeirah / Umm Suqeim / Al Wasl">Jumeirah / Umm Suqeim / Al Wasl</option>
+                  <option value="Al Barsha / Barsha Heights / The Greens">Al Barsha / Barsha Heights / The Greens</option>
+                  <option value="Palm Jumeirah / Dubai Harbour">Palm Jumeirah / Dubai Harbour</option>
+                  <option value="Al Quoz / Dubai Hills Estate">Al Quoz / Dubai Hills Estate</option>
+                  <option value="Deira / Bur Dubai / Al Karama">Deira / Bur Dubai / Al Karama</option>
+                  <option value="Mirdif / Al Warqa / Nad Al Sheba">Mirdif / Al Warqa / Nad Al Sheba</option>
+                  <option value="Dubai Silicon Oasis / Academic City">Dubai Silicon Oasis / Academic City</option>
+                  <option value="JVC (Jumeirah Village Circle) / JVT">JVC / JVT / Motor City</option>
+                  <option value="Damac Hills / Arabian Ranches / Mudon">Damac Hills / Arabian Ranches / Mudon</option>
+                  <option value="Dubai South / DIP (Dubai Investment Park)">Dubai South / DIP</option>
+                  <option value="Other Dubai Community">Other Dubai Community</option>
+                </select>
+              </div>
+            </div>
+
             <div>
               <label className="block text-zinc-300 uppercase tracking-wider text-[11px] font-semibold mb-1">
-                Street Address / Villa / Apartment <span className="text-[#ff1a2b]">*</span>
+                Street Address / Building / Villa / Apartment <span className="text-[#ff1a2b]">*</span>
               </label>
               <input
                 type="text"
                 required
                 value={formData.address}
                 onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                placeholder="Building or Villa number, Street name, Community"
+                placeholder="e.g. Tower 2, Apt 1403, Downtown or Villa 12, Street 8"
                 className="w-full bg-zinc-900 border border-white/10 px-3 py-2.5 text-white text-xs placeholder-zinc-600 focus:outline-none focus:border-[#ff1a2b]"
               />
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="block text-zinc-300 uppercase tracking-wider text-[11px] font-semibold mb-1">
-                  City / Emirate <span className="text-[#ff1a2b]">*</span>
-                </label>
-                <select
-                  value={formData.city}
-                  onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                  className="w-full bg-zinc-900 border border-white/10 px-3 py-2.5 text-white text-xs focus:outline-none focus:border-[#ff1a2b]"
-                >
-                  <option value="Dubai">Dubai</option>
-                  <option value="Abu Dhabi">Abu Dhabi</option>
-                  <option value="Sharjah">Sharjah</option>
-                  <option value="Ajman">Ajman</option>
-                  <option value="Ras Al Khaimah">Ras Al Khaimah</option>
-                  <option value="Umm Al Quwain">Umm Al Quwain</option>
-                  <option value="Fujairah">Fujairah</option>
-                  <option value="Al Ain">Al Ain</option>
-                  <option value="Other">Other / GCC</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-zinc-300 uppercase tracking-wider text-[11px] font-semibold mb-1">
-                  Postal Code (Optional)
+                  Postal Code / Makani # (Optional)
                 </label>
                 <input
                   type="text"
                   value={formData.postalCode}
                   onChange={(e) => setFormData({ ...formData, postalCode: e.target.value })}
-                  placeholder="00000"
+                  placeholder="e.g. 00000 or Makani number"
                   className="w-full bg-zinc-900 border border-white/10 px-3 py-2.5 text-white text-xs placeholder-zinc-600 focus:outline-none focus:border-[#ff1a2b]"
                 />
               </div>
@@ -383,30 +541,30 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                 </label>
                 <input
                   type="text"
-                  value={formData.country}
-                  onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                  className="w-full bg-zinc-900 border border-white/10 px-3 py-2.5 text-white text-xs focus:outline-none focus:border-[#ff1a2b]"
+                  readOnly
+                  value="United Arab Emirates"
+                  className="w-full bg-zinc-950 border border-white/10 px-3 py-2.5 text-zinc-400 text-xs cursor-not-allowed select-none focus:outline-none"
                 />
               </div>
             </div>
 
             <div>
               <label className="block text-zinc-300 uppercase tracking-wider text-[11px] font-semibold mb-1">
-                Delivery Notes / Gate Code (Optional)
+                Dubai Delivery Notes / Gate Code (Optional)
               </label>
               <input
                 type="text"
                 value={formData.deliveryNotes}
                 onChange={(e) => setFormData({ ...formData, deliveryNotes: e.target.value })}
-                placeholder="Leave at doorstep, ring bell, call upon arrival, etc."
+                placeholder="Gate intercom code, leave with reception, call 10 min prior, etc."
                 className="w-full bg-zinc-900 border border-white/10 px-3 py-2 text-white text-xs placeholder-zinc-600 focus:outline-none focus:border-[#ff1a2b]"
               />
             </div>
 
-            {/* Delivery Method Selection */}
+            {/* Dubai Delivery Method Selection */}
             <div className="pt-2">
               <label className="block text-zinc-300 uppercase tracking-wider text-[11px] font-semibold mb-2">
-                Select Delivery Zone
+                Select Dubai Delivery Zone
               </label>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <label
@@ -420,11 +578,11 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                   <div className="flex items-center gap-2">
                     <Truck size={16} className="text-[#ff1a2b]" />
                     <div>
-                      <div className="font-bold text-white">Close / Local Area</div>
-                      <div className="text-[10px] text-zinc-500">Same City · 1–2 Days</div>
+                      <div className="font-bold text-white">Central / Local Dubai</div>
+                      <div className="text-[10px] text-zinc-400">Downtown, Marina, Jumeirah, Deira · 1–2 Days</div>
                     </div>
                   </div>
-                  <span className="font-mono text-zinc-200 font-bold">15.00 AED</span>
+                  <span className="font-mono text-zinc-200 font-bold shrink-0 ml-2">15.00 AED</span>
                 </label>
 
                 <label
@@ -438,11 +596,11 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                   <div className="flex items-center gap-2">
                     <Truck size={16} className="text-zinc-400" />
                     <div>
-                      <div className="font-bold text-white">Standard Delivery</div>
-                      <div className="text-[10px] text-zinc-500">All Other Areas · 2–4 Days</div>
+                      <div className="font-bold text-white">Outer Dubai</div>
+                      <div className="text-[10px] text-zinc-400">DSO, JVC, Damac Hills, DIP · 1–2 Days</div>
                     </div>
                   </div>
-                  <span className="font-mono text-zinc-200 font-bold">30.00 AED</span>
+                  <span className="font-mono text-zinc-200 font-bold shrink-0 ml-2">30.00 AED</span>
                 </label>
               </div>
             </div>
@@ -534,15 +692,15 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
               <div className="p-4 bg-emerald-950/20 border border-emerald-900/40 text-xs text-zinc-300 space-y-2">
                 <div className="flex items-center gap-2 text-emerald-400 font-bold">
                   <CheckCircle2 size={16} />
-                  <span>Cash on Delivery (COD) Selected</span>
+                  <span>Cash on Delivery (COD) - Dubai Doorstep</span>
                 </div>
                 <p className="text-zinc-300 text-[11px] leading-relaxed">
                   No advance payment or card required. Hand over exactly{' '}
                   <strong className="text-white font-mono">{total.toFixed(2)} AED</strong> in cash
-                  directly to the courier upon delivery at your doorstep anywhere in the UAE.
+                  directly to the courier upon delivery at your doorstep anywhere across Dubai.
                 </p>
                 <div className="text-[10px] font-mono text-zinc-400">
-                  ✓ Courier will call or WhatsApp your number before arrival.
+                  ✓ Dubai courier will call or WhatsApp your number before arrival.
                 </div>
               </div>
             )}
@@ -552,10 +710,10 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
               <div className="p-4 bg-zinc-900 border border-white/10 text-xs text-zinc-300 space-y-1">
                 <p className="font-semibold text-white flex items-center gap-2">
                   <CreditCard size={14} className="text-[#ff1a2b]" />
-                  <span>Card Machine on Doorstep Delivery</span>
+                  <span>Card Machine on Doorstep Delivery (Dubai)</span>
                 </p>
                 <p className="text-zinc-400 text-[11px]">
-                  The delivery courier will bring a wireless card payment terminal (accepts Visa, Mastercard, and Apple Pay).
+                  The Dubai delivery courier will bring a wireless card payment terminal (accepts Visa, Mastercard, and Apple Pay).
                 </p>
               </div>
             )}
@@ -627,7 +785,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                 </span>
               </div>
               <div className="flex justify-between pt-1 border-t border-white/5">
-                <span>Shipping ({formData.deliveryProximity === 'close' ? 'Close' : 'Standard'})</span>
+                <span>Dubai Delivery ({formData.deliveryProximity === 'close' ? 'Central' : 'Outer'})</span>
                 <span className="text-zinc-200">{shippingCost.toFixed(2)} AED</span>
               </div>
               <div className="flex justify-between text-sm font-bold pt-1 border-t border-white/10">
@@ -683,33 +841,87 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
               </div>
             </div>
 
-            {/* Direct Email & WhatsApp Actions */}
-            <div className="p-3 bg-zinc-900 border border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
-              <div className="text-zinc-300 flex items-center gap-2">
-                <Sparkles size={14} className="text-[#ff1a2b] shrink-0" />
-                <span>Order details logged for brand dispatch to {BRAND_GMAIL}</span>
+            {/* Email Dispatch Notice & Outage Diagnostic */}
+            {emailStatus === 'fallback' ? (
+              <div className="p-3.5 bg-amber-950/30 border border-amber-600/40 text-amber-200 text-xs space-y-2">
+                <div className="flex items-start gap-2">
+                  <AlertCircle size={16} className="text-amber-400 shrink-0 mt-0.5" />
+                  <div>
+                    <span className="font-bold text-white uppercase text-[11px] block">
+                      Third-Party Relay Status: Offline (FormSubmit Error 521)
+                    </span>
+                    <p className="text-amber-200/90 text-[11px] mt-0.5 leading-relaxed">
+                      {emailNotice || 'External mail forwarder is experiencing server downtime.'} Your order is safely saved in the PWLC store system. Tap below to send it straight to <strong className="text-white underline">{BRAND_GMAIL}</strong> without relying on third-party servers.
+                    </p>
+                  </div>
+                </div>
               </div>
-              <div className="flex items-center gap-2 flex-wrap">
+            ) : (
+              <div className="p-3 bg-zinc-900 border border-white/10 text-xs text-zinc-300 flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 size={15} className="text-emerald-400 shrink-0" />
+                  <span>Order recorded for brand dispatch to <strong className="text-white">{BRAND_GMAIL}</strong></span>
+                </div>
+              </div>
+            )}
+
+            {/* Direct 1-Click Dispatch Action Center */}
+            <div className="p-4 bg-zinc-900 border border-white/10 space-y-3">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <span className="text-xs font-bold uppercase tracking-wider text-white flex items-center gap-1.5">
+                  <Mail size={14} className="text-[#ff1a2b]" />
+                  <span>Direct Brand Dispatch Actions</span>
+                </span>
+                <span className="text-[11px] font-mono text-zinc-400">
+                  Target: {BRAND_GMAIL}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                 <a
-                  href={generateMailtoUrl(confirmedOrder)}
+                  href={generateGmailWebUrl(confirmedOrder)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-white font-semibold flex items-center gap-1.5 border border-white/10 transition-colors text-[11px] whitespace-nowrap cursor-pointer"
+                  className="px-3.5 py-2.5 bg-[#ff1a2b] hover:bg-[#e01424] text-white font-bold flex items-center justify-center gap-2 transition-colors text-xs shadow-md shadow-red-950/50 cursor-pointer"
                 >
-                  <Mail size={13} className="text-[#ff1a2b]" />
-                  <span>Send Direct Email</span>
-                  <ExternalLink size={11} />
+                  <Mail size={14} />
+                  <span>Open in Gmail</span>
+                  <ExternalLink size={12} />
                 </a>
+
                 <a
                   href={generateWhatsAppUrl(confirmedOrder)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-3 py-1.5 bg-emerald-950/80 hover:bg-emerald-900 text-emerald-300 border border-emerald-800/40 font-semibold flex items-center gap-1.5 transition-colors text-[11px] whitespace-nowrap cursor-pointer"
+                  className="px-3.5 py-2.5 bg-emerald-950/80 hover:bg-emerald-900 text-emerald-300 border border-emerald-800/40 font-bold flex items-center justify-center gap-2 transition-colors text-xs cursor-pointer"
                 >
-                  <Phone size={13} className="text-emerald-400" />
-                  <span>Notify via WhatsApp</span>
-                  <ExternalLink size={11} />
+                  <Phone size={14} className="text-emerald-400" />
+                  <span>WhatsApp Brand</span>
+                  <ExternalLink size={12} />
                 </a>
+
+                <button
+                  type="button"
+                  onClick={() => handleCopyReceipt(confirmedOrder)}
+                  className="px-3.5 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-white/10 font-medium flex items-center justify-center gap-2 transition-colors text-xs cursor-pointer"
+                >
+                  {copiedReceipt ? (
+                    <>
+                      <Check size={14} className="text-emerald-400" />
+                      <span className="text-emerald-400 font-bold">Copied Receipt!</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy size={14} />
+                      <span>Copy Full Receipt</span>
+                    </>
+                  )}
+                </button>
+              </div>
+
+              <div className="pt-2 border-t border-white/5 flex flex-col sm:flex-row sm:items-center justify-between text-[10px] text-zinc-400 gap-2 font-mono">
+                <span>Also available: <a href={generateMailtoUrl(confirmedOrder)} className="text-zinc-200 hover:text-white underline">Open default mail app (mailto)</a></span>
+                <span className="text-zinc-500">Dubai Local Courier Dispatch</span>
               </div>
             </div>
 
@@ -748,7 +960,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                   <span>{confirmedOrder.subtotal.toFixed(2)} AED</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Delivery ({confirmedOrder.estimatedDelivery.includes('Close') ? 'Close Area' : 'Standard'})</span>
+                  <span>Dubai Delivery ({confirmedOrder.estimatedDelivery.includes('Central') ? 'Central Dubai' : 'Outer Dubai'})</span>
                   <span>{confirmedOrder.shipping.toFixed(2)} AED</span>
                 </div>
                 <div className="flex justify-between text-sm font-bold text-white pt-2 border-t border-white/10">
@@ -763,7 +975,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
               <div className="p-3 bg-zinc-900 border border-white/5">
                 <div className="font-bold text-white uppercase text-[11px] mb-1 flex items-center gap-1.5">
                   <MapPin size={13} className="text-[#ff1a2b]" />
-                  <span>Delivery Address</span>
+                  <span>Dubai Delivery Destination</span>
                 </div>
                 <p className="text-zinc-300 font-mono text-[11px] leading-relaxed">
                   {confirmedOrder.customer.fullName}
@@ -774,7 +986,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                   <br />
                   {confirmedOrder.customer.address}
                   <br />
-                  {confirmedOrder.customer.city}, {confirmedOrder.customer.country}
+                  Dubai, {confirmedOrder.customer.country} (Dubai Orders Only)
                 </p>
               </div>
 

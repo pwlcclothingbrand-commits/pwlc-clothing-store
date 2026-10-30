@@ -1,11 +1,12 @@
 import React from 'react';
-import { RotateCcw } from 'lucide-react';
+import { RotateCcw, Package } from 'lucide-react';
 
 interface FooterProps {
   onResetInventory: () => void;
+  onOpenOrders?: () => void;
 }
 
-export const Footer: React.FC<FooterProps> = ({ onResetInventory }) => {
+export const Footer: React.FC<FooterProps> = ({ onResetInventory, onOpenOrders }) => {
   return (
     <footer className="border-t border-white/5 bg-[#09090b] text-zinc-400 text-xs py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -57,7 +58,7 @@ export const Footer: React.FC<FooterProps> = ({ onResetInventory }) => {
             </h4>
             <ul className="space-y-2 text-xs text-zinc-500">
               <li>Strict 6-piece limit per size</li>
-              <li>Tracked global shipping</li>
+              <li>Tracked Dubai local courier dispatch</li>
               <li>14-day return privilege</li>
               <li>Pre-shrunk 100% combed cotton</li>
             </ul>
@@ -86,7 +87,18 @@ export const Footer: React.FC<FooterProps> = ({ onResetInventory }) => {
             © {new Date().getFullYear()} PWLC · PEOPLE WHO LOVES CLOTHES. All rights reserved.
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 flex-wrap justify-center sm:justify-end">
+            {onOpenOrders && (
+              <button
+                onClick={onOpenOrders}
+                className="flex items-center gap-1.5 text-zinc-400 hover:text-white transition-colors"
+                title="View Brand Orders & Dispatched Receipts"
+              >
+                <Package size={12} className="text-[#ff1a2b]" />
+                <span className="font-semibold">Brand Orders Hub</span>
+              </button>
+            )}
+            <span>·</span>
             <button
               onClick={onResetInventory}
               className="flex items-center gap-1.5 text-zinc-500 hover:text-zinc-300 transition-colors"
@@ -96,7 +108,7 @@ export const Footer: React.FC<FooterProps> = ({ onResetInventory }) => {
               <span>Reset Drop Stock</span>
             </button>
             <span>·</span>
-            <span>Worldwide Release</span>
+            <span className="text-zinc-400 font-mono">Dubai Exclusive Release</span>
           </div>
         </div>
       </div>

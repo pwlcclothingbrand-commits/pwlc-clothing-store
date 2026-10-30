@@ -80,18 +80,18 @@ export const StreetwearFeatures: React.FC<StreetwearFeaturesProps> = ({ onOrderN
     {
       id: 3,
       author: 'Sultan B.',
-      location: 'Saadiyat Island, Abu Dhabi',
+      location: 'Dubai Marina / JBR, Dubai',
       rating: 5,
       date: '1 week ago',
       sizeBought: 'Size M · Black Earth',
       review:
-        'Standard courier delivery took 2 days to Abu Dhabi. The fabric hand-feel is equivalent to Japanese heavyweight blanks. Waiting on the ski mask to drop next!',
+        'Fast courier doorstep drop in Dubai Marina. The fabric hand-feel is equivalent to Japanese heavyweight blanks. Cash on delivery was seamless. Waiting on the ski mask to drop next!',
     },
   ];
 
   return (
     <div className="mt-20 space-y-16">
-      {/* 1. Live UAE Express Dispatch & Cash on Delivery Banner */}
+      {/* 1. Live Dubai Express Dispatch & Cash on Delivery Banner */}
       <div className="bg-gradient-to-r from-[#17171d] via-[#1a1315] to-[#17171d] border border-white/10 p-6 md:p-8 relative overflow-hidden">
         <div className="absolute top-0 left-0 w-1.5 h-full bg-[#ff1a2b]" />
 
@@ -99,7 +99,7 @@ export const StreetwearFeatures: React.FC<StreetwearFeaturesProps> = ({ onOrderN
           <div className="space-y-2 max-w-xl">
             <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-[#ff1a2b] font-bold">
               <span className="w-2 h-2 rounded-full bg-[#ff1a2b] animate-ping" />
-              <span>UAE Express Dispatch & Cash on Delivery</span>
+              <span>Dubai Express Dispatch & Cash on Delivery</span>
             </div>
             <h3 className="text-xl sm:text-2xl font-bold text-white font-display">
               Order within{' '}
@@ -107,10 +107,10 @@ export const StreetwearFeatures: React.FC<StreetwearFeaturesProps> = ({ onOrderN
                 {String(timeLeft.hours).padStart(2, '0')}:{String(timeLeft.minutes).padStart(2, '0')}:
                 {String(timeLeft.seconds).padStart(2, '0')}
               </span>{' '}
-              for Next-Day Delivery
+              for Next-Day Dubai Delivery
             </h3>
             <p className="text-xs text-zinc-400 leading-relaxed">
-              Dispatched from our local UAE hub. Pay <strong className="text-white">Cash on Delivery</strong> or via courier card terminal anywhere in Dubai, Sharjah, Abu Dhabi, and Northern Emirates.
+              Dispatched locally from Dubai. Pay <strong className="text-white">Cash on Delivery</strong> or via courier card terminal across all Dubai communities. <span className="text-[#ff1a2b] font-semibold">Exclusively serving Dubai addresses.</span>
             </p>
           </div>
 
@@ -119,7 +119,7 @@ export const StreetwearFeatures: React.FC<StreetwearFeaturesProps> = ({ onOrderN
             <div className="p-3 bg-zinc-900/90 border border-white/5 flex items-center gap-3 text-xs flex-1 sm:flex-initial">
               <Truck size={20} className="text-[#ff1a2b] shrink-0" />
               <div>
-                <div className="font-bold text-white uppercase text-[11px]">15 AED Local</div>
+                <div className="font-bold text-white uppercase text-[11px]">15 AED Central Dubai</div>
                 <div className="text-[10px] text-zinc-400">1–2 Days Doorstep</div>
               </div>
             </div>
@@ -128,7 +128,7 @@ export const StreetwearFeatures: React.FC<StreetwearFeaturesProps> = ({ onOrderN
               <CheckCircle2 size={20} className="text-emerald-400 shrink-0" />
               <div>
                 <div className="font-bold text-white uppercase text-[11px]">Cash on Delivery</div>
-                <div className="text-[10px] text-emerald-400">Zero Upfront Card Needed</div>
+                <div className="text-[10px] text-emerald-400">Doorstep in Dubai</div>
               </div>
             </div>
 
@@ -161,7 +161,7 @@ export const StreetwearFeatures: React.FC<StreetwearFeaturesProps> = ({ onOrderN
               { id: 'fabric', label: '300 GSM Fabric' },
               { id: 'fit', label: 'Boxy Silhouette' },
               { id: 'care', label: 'Care & Wash' },
-              { id: 'delivery', label: 'UAE Shipping & COD' },
+              { id: 'delivery', label: 'Dubai Delivery & COD' },
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -267,23 +267,23 @@ export const StreetwearFeatures: React.FC<StreetwearFeaturesProps> = ({ onOrderN
           {activeTab === 'delivery' && (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs text-zinc-300">
               <div className="p-4 bg-zinc-900/60 border border-white/5 space-y-2">
-                <h4 className="font-bold text-white text-sm font-display">Cash on Delivery (COD)</h4>
+                <h4 className="font-bold text-white text-sm font-display">Cash on Delivery (Dubai)</h4>
                 <p className="text-zinc-400 leading-relaxed text-[11px]">
-                  Available across all 7 Emirates. You inspect the parcel and pay exact AED cash or swipe via card machine directly with the courier.
+                  Available across Dubai. You inspect the parcel and pay exact AED cash or swipe via card machine directly with the courier at your doorstep.
                 </p>
               </div>
 
               <div className="p-4 bg-zinc-900/60 border border-white/5 space-y-2">
-                <h4 className="font-bold text-white text-sm font-display">15 AED Local / 30 AED Standard</h4>
+                <h4 className="font-bold text-white text-sm font-display">15 AED Central / 30 AED Outer Dubai</h4>
                 <p className="text-zinc-400 leading-relaxed text-[11px]">
-                  Close area local courier delivery is 15 AED (1–2 days). Standard regional delivery to all other Emirates is 30 AED (2–4 days).
+                  Central Dubai courier delivery is 15 AED (1–2 days). Outer Dubai communities (DSO, JVC, Damac Hills, DIP) is 30 AED (1–2 days). Orders are restricted exclusively to Dubai.
                 </p>
               </div>
 
               <div className="p-4 bg-zinc-900/60 border border-white/5 space-y-2">
-                <h4 className="font-bold text-white text-sm font-display">Instant WhatsApp / Phone Coordination</h4>
+                <h4 className="font-bold text-white text-sm font-display">Dubai WhatsApp / Phone Coordination</h4>
                 <p className="text-zinc-400 leading-relaxed text-[11px]">
-                  The dispatch team coordinates directly with your mobile number for gate access, delivery time slot, or building reception drop.
+                  Our local Dubai dispatch team coordinates directly with your mobile number for community gate access, delivery window, or building concierge drop.
                 </p>
               </div>
             </div>

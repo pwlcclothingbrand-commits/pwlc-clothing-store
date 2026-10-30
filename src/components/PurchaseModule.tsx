@@ -357,7 +357,7 @@ export const PurchaseModule: React.FC<PurchaseModuleProps> = ({
               <div className="text-zinc-400 flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                 <span>
-                  <strong>{stock} in stock</strong> in the UAE — ships within 24h in commemorative PWLC packaging.
+                  <strong>{stock} in stock</strong> in Dubai — ships within 24h across Dubai in commemorative PWLC packaging.
                 </span>
               </div>
             )}
@@ -434,21 +434,21 @@ export const PurchaseModule: React.FC<PurchaseModuleProps> = ({
         </button>
       )}
 
-      {/* Trust & Delivery Highlights */}
+      {/* Trust & Delivery Highlights (Dubai Only) */}
       <div className="pt-4 border-t border-white/5 space-y-2 text-[11px] text-zinc-400">
         <div className="grid grid-cols-2 gap-3">
           <div className="flex items-center gap-2">
             <Truck size={14} className="text-[#ff1a2b] shrink-0" />
-            <span>Delivery: 15 AED (Close) · 30 AED</span>
+            <span>Dubai Delivery: 15 AED Central · 30 AED</span>
           </div>
           <div className="flex items-center gap-2 text-emerald-400 font-medium">
             <Check size={14} className="shrink-0" />
-            <span>Cash on Delivery (COD)</span>
+            <span>Cash on Delivery (Dubai)</span>
           </div>
         </div>
         <div className="flex items-center justify-between text-[10px] font-mono text-zinc-500 pt-1">
-          <span>✓ Pay at doorstep upon courier arrival</span>
-          <span>✓ Dubai · Sharjah · Abu Dhabi · All UAE</span>
+          <span>✓ Pay cash or card at your Dubai doorstep</span>
+          <span className="text-[#ff1a2b] font-semibold">✓ Exclusive Dubai Ordering Only</span>
         </div>
       </div>
 
