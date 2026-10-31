@@ -1,5 +1,5 @@
 import React from 'react';
-import { RotateCcw, Package } from 'lucide-react';
+import { RotateCcw, Package, Mail } from 'lucide-react';
 
 interface FooterProps {
   onResetInventory: () => void;
@@ -8,90 +8,54 @@ interface FooterProps {
 
 export const Footer: React.FC<FooterProps> = ({ onResetInventory, onOpenOrders }) => {
   return (
-    <footer className="border-t border-white/5 bg-[#09090b] text-zinc-400 text-xs py-16">
+    <footer className="border-t border-white/5 bg-[#09090b] text-zinc-400 text-xs py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
-          {/* Brand Col */}
-          <div className="space-y-3">
-            <div className="flex items-baseline gap-1 text-2xl font-black text-white font-display">
-              <span>PWLC</span>
-              <span className="w-1.5 h-1.5 rounded-full bg-[#ff1a2b]" />
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pb-8 border-b border-white/5">
+          {/* Brand Info */}
+          <div>
+            <div className="text-2xl font-black text-white font-display tracking-tight">
+              PWLC
             </div>
-            <p className="text-zinc-500 text-xs leading-relaxed max-w-xs">
-              People Who Loves Clothes. Heavyweight garments engineered with intentional architectural silhouettes and hand-finished washes.
+            <p className="text-zinc-500 text-xs mt-1 font-mono">
+              PEOPLE WHO LOVES CLOTHES · 300 GSM HEAVYWEIGHT COTTON · DUBAI EXCLUSIVE DISPATCH
             </p>
           </div>
 
-          {/* Navigation */}
-          <div>
-            <h4 className="font-semibold text-white uppercase tracking-wider text-[11px] mb-3">
-              Store
-            </h4>
-            <ul className="space-y-2 text-xs">
-              <li>
-                <a href="#product" className="hover:text-white transition-colors">
-                  Drop 01: Signature Washed Tee
-                </a>
-              </li>
-              <li>
-                <a href="#craftsmanship" className="hover:text-white transition-colors">
-                  300 GSM Fabrication
-                </a>
-              </li>
-              <li>
-                <a href="#sizing" className="hover:text-white transition-colors">
-                  Fit & Measurements
-                </a>
-              </li>
-              <li>
-                <a href="#manifesto" className="hover:text-white transition-colors">
-                  The PWLC Manifesto
-                </a>
-              </li>
-            </ul>
-          </div>
-
-          {/* Drop Policies */}
-          <div>
-            <h4 className="font-semibold text-white uppercase tracking-wider text-[11px] mb-3">
-              Drop Guidelines
-            </h4>
-            <ul className="space-y-2 text-xs text-zinc-500">
-              <li>Strict 6-piece limit per size</li>
-              <li>Tracked Dubai local courier dispatch</li>
-              <li>14-day return privilege</li>
-              <li>Pre-shrunk 100% combed cotton</li>
-            </ul>
-          </div>
-
-          {/* Contact & Support */}
-          <div>
-            <h4 className="font-semibold text-white uppercase tracking-wider text-[11px] mb-3">
-              Direct Inquiries
-            </h4>
-            <p className="text-xs text-zinc-500 mb-2">
-              For wholesale inquiries or archival support:
-            </p>
+          {/* Quick Links & Contact */}
+          <div className="flex items-center gap-6 flex-wrap text-xs font-mono">
+            <a href="#product" className="text-zinc-400 hover:text-white transition-colors">
+              T-Shirts
+            </a>
+            <a href="#product" className="text-zinc-400 hover:text-white transition-colors">
+              Ski Mask
+            </a>
+            <a href="#upcoming" className="text-zinc-400 hover:text-white transition-colors">
+              Drop 02
+            </a>
+            <a href="#sizing" className="text-zinc-400 hover:text-white transition-colors">
+              Sizing
+            </a>
             <a
               href="mailto:pwlcclothingbrand@gmail.com"
-              className="text-white hover:text-[#ff1a2b] font-mono text-xs transition-colors block underline"
+              className="text-zinc-300 hover:text-[#ff1a2b] transition-colors flex items-center gap-1"
             >
-              pwlcclothingbrand@gmail.com
+              <Mail size={12} />
+              <span>Contact</span>
             </a>
           </div>
         </div>
 
         {/* Bottom Bar */}
-        <div className="pt-8 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-zinc-600">
+        <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-zinc-500 font-mono">
           <div>
-            © {new Date().getFullYear()} PWLC · PEOPLE WHO LOVES CLOTHES. All rights reserved.
+            © {new Date().getFullYear()} PWLC. All rights reserved.
           </div>
 
           <div className="flex items-center gap-4 flex-wrap justify-center sm:justify-end">
             {onOpenOrders && (
               <button
                 onClick={onOpenOrders}
-                className="flex items-center gap-1.5 text-zinc-400 hover:text-white transition-colors"
+                className="flex items-center gap-1.5 text-zinc-300 hover:text-white transition-colors cursor-pointer"
                 title="View Brand Orders & Dispatched Receipts"
               >
                 <Package size={12} className="text-[#ff1a2b]" />
@@ -101,14 +65,14 @@ export const Footer: React.FC<FooterProps> = ({ onResetInventory, onOpenOrders }
             <span>·</span>
             <button
               onClick={onResetInventory}
-              className="flex items-center gap-1.5 text-zinc-500 hover:text-zinc-300 transition-colors"
-              title="Reset stock to initial release numbers (6 for S/M/L, 0 for XS/XL/XXL)"
+              className="flex items-center gap-1.5 text-zinc-500 hover:text-zinc-300 transition-colors cursor-pointer"
+              title="Reset stock to initial release numbers"
             >
-              <RotateCcw size={12} />
+              <RotateCcw size={11} />
               <span>Reset Drop Stock</span>
             </button>
             <span>·</span>
-            <span className="text-zinc-400 font-mono">Dubai Exclusive Release</span>
+            <span>Dubai Doorstep COD</span>
           </div>
         </div>
       </div>

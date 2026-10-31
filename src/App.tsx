@@ -3,16 +3,14 @@ import { Header } from './components/Header';
 import { ProductViewer } from './components/ProductViewer';
 import { PurchaseModule } from './components/PurchaseModule';
 import { UpcomingDrops } from './components/UpcomingDrops';
-import { HeadwearCategory } from './components/HeadwearCategory';
 import { SizeChartModal } from './components/SizeChartModal';
 import { FitCalculatorModal } from './components/FitCalculatorModal';
 import { RestockModal } from './components/RestockModal';
-import { SpecsSection } from './components/SpecsSection';
-import { BrandStory } from './components/BrandStory';
 import { CartDrawer } from './components/CartDrawer';
 import { CheckoutModal } from './components/CheckoutModal';
 import { BrandOrdersModal } from './components/BrandOrdersModal';
-import { StreetwearFeatures } from './components/StreetwearFeatures';
+import { AuthenticityCertificateModal } from './components/AuthenticityCertificateModal';
+import { StickyMobileBuyBar } from './components/StickyMobileBuyBar';
 import { Footer } from './components/Footer';
 import { INITIAL_INVENTORY, COLORWAYS, HEADWEAR_ITEMS, PRODUCT_DATA } from './data/product';
 import { Size, SizeInventory, CartItem, OrderDetails, Colorway } from './types';
@@ -71,6 +69,7 @@ export default function App() {
   });
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [isOrdersModalOpen, setIsOrdersModalOpen] = useState(false);
+  const [isCertModalOpen, setIsCertModalOpen] = useState(false);
   const [ordersCount, setOrdersCount] = useState(1);
   const [checkoutDiscount, setCheckoutDiscount] = useState<{ amount: number; code: string }>({
     amount: 0,
@@ -227,7 +226,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0b0b0d] text-white flex flex-col selection:bg-[#ff1a2b] selection:text-white">
+    <div className="min-h-screen bg-transparent text-white flex flex-col selection:bg-[#ff1a2b] selection:text-white">
       {/* Top Bar Navigation */}
       <Header
         cartCount={cartCount}
@@ -265,34 +264,20 @@ export default function App() {
                   targetName: colorwayName || `${currentColorway.colorName} (Size ${size})`,
                 })
               }
+              onOpenAuthenticityCertificate={() => setIsCertModalOpen(true)}
             />
           </div>
         </div>
 
-        {/* Dedicated Headwear & Ski Mask Category Showcase Section */}
-        <HeadwearCategory
-          onSelectHeadwear={(mask) => {
-            setCurrentColorway(mask);
-            setSelectedSize('OSFA');
-            const target = document.getElementById('product');
-            target?.scrollIntoView({ behavior: 'smooth' });
-          }}
-          onOpenRestockModal={(colorwayName) =>
-            setRestockModal({
-              isOpen: true,
-              size: 'OSFA',
-              targetName: colorwayName,
-            })
-          }
-        />
-
-        {/* Dedicated Upcoming Drops Section (Drop 02 T-Shirt Colorways) */}
+        {/* Dedicated Upcoming Drops Section (Drop 02 Collection) */}
         <UpcomingDrops
           comingSoonColorways={comingSoonColorways}
           onSelectColorway={(colorway) => {
             setCurrentColorway(colorway);
             if (colorway.category === 't-shirt' && selectedSize === 'OSFA') {
               setSelectedSize('M');
+            } else if (colorway.category === 'headwear') {
+              setSelectedSize('OSFA');
             }
             const target = document.getElementById('product');
             target?.scrollIntoView({ behavior: 'smooth' });
@@ -306,9 +291,6 @@ export default function App() {
           }
         />
 
-        {/* Live UAE Express Dispatch, Cash on Delivery, Tech Specs & Verified Drop Reviews */}
-        <StreetwearFeatures onOrderNow={handleHeaderOrder} />
-
         {/* Inline Size & Measurements Table Anchor */}
         <div id="sizing" className="mt-24 pt-16 border-t border-white/5">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
@@ -316,11 +298,11 @@ export default function App() {
               <div className="text-xs font-mono tracking-widest uppercase text-[#ff1a2b] font-bold mb-2">
                 FIT & MEASUREMENTS
               </div>
-              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-white font-display">
-                Drop 01 & Drop 02 Cut Matrix
+              <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white font-display uppercase">
+                Size & Measurements
               </h2>
-              <p className="text-xs text-zinc-400 mt-1 max-w-lg">
-                Engineered for an intentional boxy silhouette with relaxed shoulders, tight non-sag collar, and zero fabric shrinkage across all colorways.
+              <p className="text-xs text-zinc-400 mt-1 font-mono">
+                Boxy oversized fit. Order your true size for relaxed drop-shoulder drape.
               </p>
             </div>
 
@@ -440,12 +422,6 @@ export default function App() {
         </div>
       </main>
 
-      {/* Specifications & Craftsmanship Section */}
-      <SpecsSection />
-
-      {/* Brand Story & Manifesto */}
-      <BrandStory />
-
       {/* Footer */}
       <Footer
         onResetInventory={handleResetInventory}
@@ -496,6 +472,25 @@ export default function App() {
       <BrandOrdersModal
         isOpen={isOrdersModalOpen}
         onClose={() => setIsOrdersModalOpen(false)}
+      />
+
+      <AuthenticityCertificateModal
+        isOpen={isCertModalOpen}
+        onClose={() => setIsCertModalOpen(false)}
+        productName={currentColorway.name}
+      />
+
+      {/* Sticky Bottom Bar for Mobile Viewports */}
+      <StickyMobileBuyBar
+        colorway={currentColorway}
+        selectedSize={selectedSize}
+        onOrderNow={() =>
+          handleOrderNow(
+            currentColorway,
+            currentColorway.category === 'headwear' ? 'OSFA' : selectedSize,
+            1
+          )
+        }
       />
     </div>
   );

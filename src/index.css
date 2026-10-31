@@ -1,28 +1,70 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @layer base {
+  html {
+    scroll-behavior: smooth;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
   body {
     font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
     color-scheme: dark;
+    background-color: #08080a;
+    background-image: 
+      radial-gradient(circle at 50% -10%, rgba(255, 26, 43, 0.07), transparent 45%),
+      radial-gradient(circle at 85% 20%, rgba(255, 255, 255, 0.02), transparent 35%),
+      radial-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+    background-size: 100% 100%, 100% 100%, 28px 28px;
+    background-attachment: fixed;
+    color: #f4f4f5;
   }
   
   h1, h2, h3, h4, .font-display {
     font-family: 'Outfit', sans-serif;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.025em;
+  }
+
+  ::selection {
+    background-color: #ff1a2b;
+    color: #ffffff;
   }
 }
 
-/* Custom scrollbar for streetwear clean feel */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Streetwear smooth button transitions */
+button, a {
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Custom refined scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: #0b0b0d;
+  background: #08080a;
 }
 ::-webkit-scrollbar-thumb {
   background: #27272a;
-  border-radius: 3px;
+  border-radius: 2px;
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #3f3f46;

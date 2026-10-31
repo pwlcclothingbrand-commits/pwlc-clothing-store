@@ -1,96 +1,44 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { ChevronLeft, ChevronRight, Play, Pause, ZoomIn, ShieldCheck, Sparkles, RefreshCw } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { ChevronLeft, ChevronRight, ZoomIn, Maximize2, X, RefreshCw } from 'lucide-react';
 
 interface ProductViewerProps {
   imageSrc: string;
   productName: string;
 }
 
-type SideView = 'front' | 'back' | 'both';
+export const ProductViewer: React.FC<ProductViewerProps> = ({
+  imageSrc,
+  productName,
+}) => {
+  const isHeadwear =
+    productName.toLowerCase().includes('balaclava') ||
+    productName.toLowerCase().includes('mask') ||
+    imageSrc.includes('Balaclava');
 
-export const ProductViewer: React.FC<ProductViewerProps> = ({ imageSrc, productName }) => {
-  const [activeSide, setActiveSide] = useState<SideView>('front');
-  const [autoRotate, setAutoRotate] = useState<boolean>(true);
+  // Active view:
+  // For T-Shirts: 'both' | 'front' | 'back'
+  // For Headwear: 'full' | 'logo' | 'texture'
+  const [activeView, setActiveView] = useState<string>(isHeadwear ? 'full' : 'both');
   const [isHovered, setIsHovered] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 50, y: 50 });
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Touch & Mouse swipe handling
-  const touchStartX = useRef<number | null>(null);
-  const touchEndX = useRef<number | null>(null);
-  const isMouseDown = useRef<boolean>(false);
-  const mouseStartX = useRef<number | null>(null);
-  const hasDragged = useRef<boolean>(false);
+  // Sync default view when product category changes
+  const [lastProduct, setLastProduct] = useState(productName);
+  if (productName !== lastProduct) {
+    setLastProduct(productName);
+    setActiveView(isHeadwear ? 'full' : 'both');
+  }
 
-  // Auto-switch between front and back every 4 seconds
+  // Handle ESC key for fullscreen modal
   useEffect(() => {
-    if (!autoRotate || isHovered) return;
-
-    const interval = setInterval(() => {
-      setActiveSide((prev) => (prev === 'front' ? 'back' : 'front'));
-    }, 4000);
-
-    return () => clearInterval(interval);
-  }, [autoRotate, isHovered]);
-
-  const handleTouchStart = (e: React.TouchEvent) => {
-    touchStartX.current = e.touches[0].clientX;
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    touchEndX.current = e.touches[0].clientX;
-  };
-
-  const handleTouchEnd = () => {
-    if (touchStartX.current === null || touchEndX.current === null) {
-      touchStartX.current = null;
-      touchEndX.current = null;
-      return;
-    }
-    const diff = touchStartX.current - touchEndX.current;
-    const minSwipeDistance = 35;
-
-    if (diff > minSwipeDistance) {
-      // Swiped left -> show Back
-      setActiveSide('back');
-    } else if (diff < -minSwipeDistance) {
-      // Swiped right -> show Front
-      setActiveSide('front');
-    }
-
-    touchStartX.current = null;
-    touchEndX.current = null;
-  };
-
-  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
-    isMouseDown.current = true;
-    mouseStartX.current = e.clientX;
-    hasDragged.current = false;
-  };
-
-  const handleMouseUp = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!isMouseDown.current || mouseStartX.current === null) {
-      isMouseDown.current = false;
-      return;
-    }
-    const diff = mouseStartX.current - e.clientX;
-    isMouseDown.current = false;
-
-    if (Math.abs(diff) > 35) {
-      hasDragged.current = true;
-      if (diff > 35) {
-        // Dragged left -> show Back
-        setActiveSide('back');
-      } else {
-        // Dragged right -> show Front
-        setActiveSide('front');
-      }
-    } else if (!hasDragged.current) {
-      // Simple press/click -> flip side
-      toggleSide();
-    }
-    mouseStartX.current = null;
-  };
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setIsFullscreen(false);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!containerRef.current) return;
@@ -100,202 +48,281 @@ export const ProductViewer: React.FC<ProductViewerProps> = ({ imageSrc, productN
     setMousePosition({ x, y });
   };
 
-  const toggleSide = () => {
-    setActiveSide((prev) => (prev === 'front' ? 'back' : 'front'));
-  };
-
-  // Determine transform style for front, back, or full spread
   const getTransformStyle = () => {
-    // If hovering with mouse, enable precision zoom
     if (isHovered) {
       return {
         transformOrigin: `${mousePosition.x}% ${mousePosition.y}%`,
-        transform: 'scale(2.2)',
-        transition: 'transform 0.15s ease-out',
+        transform: 'scale(2.4)',
+        transition: 'transform 0.1s ease-out, transform-origin 0.06s ease-out',
       };
     }
 
-    switch (activeSide) {
+    if (isHeadwear) {
+      switch (activeView) {
+        case 'logo':
+          return {
+            transformOrigin: '50% 36%',
+            transform: 'scale(2.2)',
+            transition: 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform-origin 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
+          };
+        case 'texture':
+          return {
+            transformOrigin: '50% 55%',
+            transform: 'scale(1.95)',
+            transition: 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform-origin 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
+          };
+        case 'full':
+        default:
+          return {
+            transformOrigin: '50% 50%',
+            transform: 'scale(1)',
+            transition: 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform-origin 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
+          };
+      }
+    }
+
+    // T-Shirt transform handling
+    switch (activeView) {
       case 'front':
-        // Smoothly center the left front shirt
         return {
           transformOrigin: '25% 50%',
           transform: 'scale(1.9)',
-          transition: 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform-origin 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
+          transition: 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform-origin 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
         };
       case 'back':
-        // Smoothly center the right back shirt with Earth graphic
         return {
           transformOrigin: '75% 50%',
           transform: 'scale(1.9)',
-          transition: 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform-origin 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
+          transition: 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform-origin 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
         };
       case 'both':
       default:
         return {
           transformOrigin: '50% 50%',
           transform: 'scale(1)',
-          transition: 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
+          transition: 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform-origin 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
         };
     }
   };
 
+  const handleNextSide = () => {
+    if (isHeadwear) {
+      setActiveView((prev) => (prev === 'full' ? 'logo' : prev === 'logo' ? 'texture' : 'full'));
+    } else {
+      setActiveView((prev) => (prev === 'both' ? 'front' : prev === 'front' ? 'back' : 'both'));
+    }
+  };
+
+  const handlePrevSide = () => {
+    if (isHeadwear) {
+      setActiveView((prev) => (prev === 'full' ? 'texture' : prev === 'texture' ? 'logo' : 'full'));
+    } else {
+      setActiveView((prev) => (prev === 'back' ? 'front' : prev === 'front' ? 'both' : 'back'));
+    }
+  };
+
   return (
-    <div className="flex flex-col gap-4">
-      {/* Main Showcase Canvas */}
+    <div className="flex flex-col gap-3">
+      {/* Studio Showcase Canvas */}
       <div
         ref={containerRef}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-        onMouseDown={handleMouseDown}
-        onMouseUp={handleMouseUp}
         onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => {
-          setIsHovered(false);
-          isMouseDown.current = false;
-        }}
+        onMouseLeave={() => setIsHovered(false)}
         onMouseMove={handleMouseMove}
-        className="relative aspect-square sm:aspect-[4/3] md:aspect-square lg:aspect-[16/11] w-full bg-[#121215] border border-white/5 overflow-hidden group select-none cursor-grab active:cursor-grabbing flex items-center justify-center p-4 sm:p-6"
+        className="relative aspect-square sm:aspect-[4/3] md:aspect-square lg:aspect-[16/11] w-full bg-gradient-to-b from-[#131317] via-[#0e0e12] to-[#08080a] border border-white/10 overflow-hidden group select-none flex items-center justify-center p-6 sm:p-10 shadow-2xl transition-all"
       >
-        {/* Subtle grid background texture */}
-        <div 
-          className="absolute inset-0 opacity-[0.03] pointer-events-none"
-          style={{
-            backgroundImage: `radial-gradient(circle at 1px 1px, white 1px, transparent 0)`,
-            backgroundSize: '24px 24px',
-          }}
-        />
+        {/* Architectural Studio Lighting Gradients */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,rgba(255,26,43,0.08),transparent_65%)] pointer-events-none" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_75%,rgba(255,255,255,0.04),transparent_50%)] pointer-events-none" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_bottom,transparent_0%,rgba(0,0,0,0.4)_100%)] pointer-events-none" />
 
-        {/* Studio Product Image */}
+        {/* Studio Product Flat-Lay Artwork */}
         <img
           src={imageSrc}
           alt={productName}
           referrerPolicy="no-referrer"
-          className="w-full h-full object-contain will-change-transform filter drop-shadow-[0_20px_35px_rgba(0,0,0,0.8)]"
+          className="w-full h-full object-contain will-change-transform filter drop-shadow-[0_30px_60px_rgba(0,0,0,0.95)] cursor-crosshair transition-all duration-300"
           style={getTransformStyle()}
         />
 
-        {/* Left / Right Chevron Controls for Quick Flip */}
+        {/* Minimal Navigation Arrows */}
         <button
+          type="button"
           onClick={(e) => {
             e.stopPropagation();
-            toggleSide();
+            handlePrevSide();
           }}
-          className="absolute left-3 top-1/2 -translate-y-1/2 z-10 w-9 h-9 bg-black/60 hover:bg-[#ff1a2b] text-white flex items-center justify-center border border-white/10 transition-colors shadow-lg"
-          aria-label="View previous side"
+          className="absolute left-3.5 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-black/80 hover:bg-[#ff1a2b] text-white flex items-center justify-center border border-white/10 transition-all shadow-xl hover:scale-105 active:scale-95 cursor-pointer backdrop-blur-md"
+          aria-label="Previous view"
         >
           <ChevronLeft size={18} />
         </button>
 
         <button
+          type="button"
           onClick={(e) => {
             e.stopPropagation();
-            toggleSide();
+            handleNextSide();
           }}
-          className="absolute right-3 top-1/2 -translate-y-1/2 z-10 w-9 h-9 bg-black/60 hover:bg-[#ff1a2b] text-white flex items-center justify-center border border-white/10 transition-colors shadow-lg"
-          aria-label="View next side"
+          className="absolute right-3.5 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-black/80 hover:bg-[#ff1a2b] text-white flex items-center justify-center border border-white/10 transition-all shadow-xl hover:scale-105 active:scale-95 cursor-pointer backdrop-blur-md"
+          aria-label="Next view"
         >
           <ChevronRight size={18} />
         </button>
 
-        {/* Active Side Indicator Badge */}
-        <div className="absolute top-4 left-4 flex flex-col gap-1.5 pointer-events-none z-10">
-          <div className="flex items-center gap-2">
-            <span className="text-[10px] font-mono tracking-widest uppercase text-white font-bold bg-[#ff1a2b] px-2 py-0.5">
-              {activeSide === 'front' ? 'FRONT VIEW' : activeSide === 'back' ? 'BACK VIEW (EARTH)' : 'FRONT & BACK'}
-            </span>
-            <span className="text-[10px] font-mono text-zinc-400 bg-black/70 px-2 py-0.5 border border-white/10 hidden sm:inline">
-              Swipe or tap arrows
-            </span>
-          </div>
+        {/* View Badge (Top-Left) */}
+        <div className="absolute top-4 left-4 z-10 pointer-events-none flex items-center gap-2">
+          <span className="text-[10px] font-mono tracking-widest uppercase text-white font-bold bg-[#ff1a2b] px-2.5 py-1 shadow-lg shadow-red-950/60">
+            {isHeadwear
+              ? activeView === 'logo'
+                ? 'EMBROIDERED LOGO'
+                : activeView === 'texture'
+                ? 'COMPRESSION KNIT'
+                : 'FULL SILHOUETTE'
+              : activeView === 'front'
+              ? 'FRONT CHEST SCRIPT'
+              : activeView === 'back'
+              ? 'BACK EARTH GRAPHIC'
+              : 'DUAL SPREAD VIEW'}
+          </span>
+          <span className="hidden sm:inline-block text-[9px] font-mono text-zinc-400 bg-black/60 px-2 py-1 border border-white/5 backdrop-blur-md uppercase tracking-wider">
+            300 GSM ARCHIVE
+          </span>
         </div>
 
-        {/* 4-Second Auto-Rotation Pill */}
-        <div className="absolute top-4 right-4 z-10 flex items-center gap-2">
+        {/* Fullscreen Expand Action (Top-Right) */}
+        <div className="absolute top-4 right-4 z-10 flex items-center gap-1.5">
           <button
-            onClick={() => setAutoRotate(!autoRotate)}
-            className={`px-2.5 py-1 text-[10px] font-mono uppercase tracking-wider flex items-center gap-1.5 border transition-all ${
-              autoRotate
-                ? 'bg-amber-500/20 border-amber-500/40 text-amber-300'
-                : 'bg-zinc-900/80 border-white/10 text-zinc-400 hover:text-white'
-            }`}
-            title="Toggle 4-second auto-switching"
+            type="button"
+            onClick={() => setIsFullscreen(true)}
+            className="p-2 bg-black/70 hover:bg-zinc-800 text-zinc-300 hover:text-white border border-white/10 transition-all backdrop-blur-md cursor-pointer shadow-lg"
+            title="Expand Fullscreen View"
+            aria-label="Expand Fullscreen View"
           >
-            {autoRotate ? (
-              <>
-                <RefreshCw size={11} className="animate-spin text-amber-400" />
-                <span>4s Auto-Switch ON</span>
-              </>
-            ) : (
-              <>
-                <Play size={11} />
-                <span>Auto-Switch Paused</span>
-              </>
-            )}
+            <Maximize2 size={14} />
           </button>
         </div>
 
-        {/* Hover Hint */}
-        <div className="absolute bottom-4 left-4 flex items-center gap-2 text-[11px] text-zinc-400 bg-black/70 backdrop-blur-md px-2.5 py-1 border border-white/10 pointer-events-none z-10">
-          <ZoomIn size={12} className="text-[#ff1a2b]" />
-          <span>Swipe left/right or hover to zoom</span>
+        {/* Interactive Loupe Status (Bottom-Left) */}
+        <div className="absolute bottom-4 left-4 z-10 flex items-center gap-2 text-[11px] font-mono text-zinc-400 bg-black/80 backdrop-blur-md px-3 py-1.5 border border-white/10 pointer-events-none">
+          <ZoomIn size={13} className="text-[#ff1a2b]" />
+          <span>{isHovered ? '2.4x Magnifier Active' : 'Hover to inspect print & weave'}</span>
+        </div>
+
+        {/* Studio Technical Stamp (Bottom-Right) */}
+        <div className="absolute bottom-4 right-4 z-10 hidden sm:block text-[9px] font-mono tracking-widest text-zinc-400 uppercase pointer-events-none">
+          PWLC // VAULT SPEC
         </div>
       </div>
 
-      {/* Preset View Switcher & Tabs */}
-      <div className="grid grid-cols-3 gap-2 text-xs">
-        <button
-          onClick={() => {
-            setActiveSide('front');
-          }}
-          className={`p-3 text-center border transition-all ${
-            activeSide === 'front'
-              ? 'bg-zinc-900 border-[#ff1a2b] text-white font-bold'
-              : 'bg-[#121215] border-white/5 text-zinc-400 hover:text-zinc-200 hover:border-white/20'
-          }`}
-        >
-          <div className="uppercase tracking-wider text-[11px] flex items-center justify-center gap-1.5">
-            <span>Front Side</span>
-            {activeSide === 'front' && <span className="w-1.5 h-1.5 rounded-full bg-[#ff1a2b]" />}
-          </div>
-          <div className="text-[10px] text-zinc-500 mt-0.5">PWLC Chest Script</div>
-        </button>
+      {/* Preset View Switcher with Active Indicators */}
+      {isHeadwear ? (
+        <div className="grid grid-cols-3 gap-2 text-xs">
+          {[
+            { id: 'full', label: 'Full Silhouette', desc: 'Anatomical Mask' },
+            { id: 'logo', label: 'PWLC Logo', desc: 'Scarlet Embroidery' },
+            { id: 'texture', label: 'Eye Slit & Weave', desc: 'Thermal Knit' },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setActiveView(tab.id)}
+              className={`p-3 text-left border transition-all cursor-pointer ${
+                activeView === tab.id
+                  ? 'bg-zinc-900 border-[#ff1a2b] text-white shadow-lg shadow-red-950/20'
+                  : 'bg-[#111114] border-white/5 text-zinc-400 hover:text-white hover:border-white/20'
+              }`}
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-white">
+                  {tab.label}
+                </span>
+                {activeView === tab.id && (
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#ff1a2b]" />
+                )}
+              </div>
+              <div className="text-[10px] text-zinc-400 mt-0.5">{tab.desc}</div>
+            </button>
+          ))}
+        </div>
+      ) : (
+        <div className="grid grid-cols-3 gap-2 text-xs">
+          {[
+            { id: 'both', label: 'Dual Spread', desc: 'Complete Piece' },
+            { id: 'front', label: 'Front Chest', desc: 'PWLC Script' },
+            { id: 'back', label: 'Back Earth', desc: 'Earth & Stars' },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setActiveView(tab.id)}
+              className={`p-3 text-left border transition-all cursor-pointer ${
+                activeView === tab.id
+                  ? 'bg-zinc-900/95 border-[#ff1a2b] text-white shadow-lg shadow-red-950/20 ring-1 ring-[#ff1a2b]/30'
+                  : 'bg-[#111114] border-white/5 text-zinc-400 hover:text-white hover:border-white/20'
+              }`}
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-white">
+                  {tab.label}
+                </span>
+                {activeView === tab.id && (
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#ff1a2b]" />
+                )}
+              </div>
+              <div className="text-[10px] text-zinc-400 mt-0.5">{tab.desc}</div>
+            </button>
+          ))}
+        </div>
+      )}
 
-        <button
-          onClick={() => {
-            setActiveSide('back');
-          }}
-          className={`p-3 text-center border transition-all ${
-            activeSide === 'back'
-              ? 'bg-zinc-900 border-[#ff1a2b] text-white font-bold'
-              : 'bg-[#121215] border-white/5 text-zinc-400 hover:text-zinc-200 hover:border-white/20'
-          }`}
+      {/* Fullscreen Lightbox Modal */}
+      {isFullscreen && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-50 bg-black/95 backdrop-blur-2xl flex flex-col p-4 sm:p-8 animate-fadeIn"
         >
-          <div className="uppercase tracking-wider text-[11px] flex items-center justify-center gap-1.5">
-            <span>Back Side</span>
-            {activeSide === 'back' && <span className="w-1.5 h-1.5 rounded-full bg-[#ff1a2b]" />}
+          {/* Top Bar */}
+          <div className="flex items-center justify-between pb-4 border-b border-white/10 text-xs font-mono">
+            <div className="flex items-center gap-3">
+              <span className="font-bold text-white uppercase">{productName}</span>
+              <span className="text-zinc-600">/</span>
+              <span className="text-[#ff1a2b] uppercase">HIGH-RESOLUTION INSPECTION</span>
+            </div>
+            <button
+              onClick={() => setIsFullscreen(false)}
+              className="px-3 py-1.5 bg-zinc-900 hover:bg-[#ff1a2b] text-white border border-white/10 transition-colors flex items-center gap-1.5 cursor-pointer"
+            >
+              <X size={14} />
+              <span>Close (ESC)</span>
+            </button>
           </div>
-          <div className="text-[10px] text-zinc-500 mt-0.5">Earth Graphic & Stars</div>
-        </button>
 
-        <button
-          onClick={() => {
-            setActiveSide('both');
-          }}
-          className={`p-3 text-center border transition-all ${
-            activeSide === 'both'
-              ? 'bg-zinc-900 border-[#ff1a2b] text-white font-bold'
-              : 'bg-[#121215] border-white/5 text-zinc-400 hover:text-zinc-200 hover:border-white/20'
-          }`}
-        >
-          <div className="uppercase tracking-wider text-[11px] flex items-center justify-center gap-1.5">
-            <span>Dual View</span>
-            {activeSide === 'both' && <span className="w-1.5 h-1.5 rounded-full bg-[#ff1a2b]" />}
+          {/* Fullscreen Showcase */}
+          <div className="flex-1 flex items-center justify-center p-4 relative overflow-hidden">
+            <img
+              src={imageSrc}
+              alt={productName}
+              referrerPolicy="no-referrer"
+              className="max-h-[82vh] max-w-[92vw] object-contain filter drop-shadow-[0_30px_70px_rgba(0,0,0,0.95)]"
+            />
           </div>
-          <div className="text-[10px] text-zinc-500 mt-0.5">Front & Back Together</div>
-        </button>
-      </div>
+
+          {/* Bottom Bar Controls */}
+          <div className="flex items-center justify-between pt-4 border-t border-white/10 text-xs font-mono text-zinc-400">
+            <div>300 GSM COMBED ORGANIC COTTON · HIGH DENSITY SCREENPRINT</div>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setIsFullscreen(false)}
+                className="hover:text-white transition-colors cursor-pointer"
+              >
+                Exit Lightbox
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

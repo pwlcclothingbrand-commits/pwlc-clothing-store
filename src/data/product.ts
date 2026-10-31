@@ -86,7 +86,7 @@ export const TSHIRT_COLORWAYS: Colorway[] = [
     status: 'coming_soon',
     releaseTag: 'PWLC 003 · COMING SOON',
     dropNumber: 'PWLC 003',
-    image: '/assets/pwlc_003_white_earth.jpeg',
+    image: '/assets/pwlc_003_white_earth.png',
     price: 75.0,
     description:
       'PWLC 003 White Earth Design. Warm unbleached stone white wash on heavyweight 300 GSM jersey, accented with high-density red PWLC chest insignia and back Earth graphic.',

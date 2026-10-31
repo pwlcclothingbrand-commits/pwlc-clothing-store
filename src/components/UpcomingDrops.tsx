@@ -1,6 +1,7 @@
 import React from 'react';
 import { Colorway } from '../types';
-import { Bell, Eye, Clock, Sparkles, Layers } from 'lucide-react';
+import { HEADWEAR_ITEMS } from '../data/product';
+import { Bell, Eye, ArrowUpRight } from 'lucide-react';
 
 interface UpcomingDropsProps {
   comingSoonColorways: Colorway[];
@@ -13,163 +14,108 @@ export const UpcomingDrops: React.FC<UpcomingDropsProps> = ({
   onSelectColorway,
   onOpenRestockModal,
 }) => {
-  // Filter strictly for T-Shirts coming soon (Pink Earth, White Earth, Light Blue Earth - no grey!)
-  const tshirtComingSoon = comingSoonColorways.filter(
-    (c) => c.category === 't-shirt'
-  );
+  // All 4 Drop 02 preview items: Tactical Balaclava + 3 upcoming tees
+  const allDrop02Items: Colorway[] = [
+    HEADWEAR_ITEMS[0],
+    ...comingSoonColorways.filter((c) => c.category === 't-shirt'),
+  ];
 
   return (
-    <section id="upcoming" className="py-20 border-t border-white/5 bg-[#0e0e12]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
-          <div>
-            <div className="text-xs font-mono tracking-widest uppercase text-amber-400 font-bold mb-2 flex items-center gap-1.5">
-              <Clock size={13} />
-              <span>CATEGORY: DROP 02 HEAVYWEIGHT TEES · COMING SOON</span>
-            </div>
-            <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-white font-display">
-              Upcoming T-Shirt Colorways
-            </h2>
-            <p className="mt-3 text-sm text-zinc-400 max-w-2xl leading-relaxed">
-              Drop 02 expands the PWLC heavyweight lineup with <strong>PWLC 002 Pink Earth, PWLC 003 White Earth, and PWLC 004 Light Blue Earth</strong>. Each 75 AED with 15 AED local / 30 AED standard UAE delivery and Cash on Delivery. Strictly limited to 6 shirts per size.
-            </p>
-          </div>
+    <section id="upcoming" className="py-24 border-t border-white/8 bg-[#09090b] relative">
+      {/* Background Ambience */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,26,43,0.03),transparent_70%)] pointer-events-none" />
 
-          <div className="flex items-center gap-4">
-            <a
-              href="#headwear"
-              className="text-xs font-mono px-3 py-1.5 bg-zinc-900 border border-white/10 hover:border-[#ff1a2b] text-zinc-300 hover:text-white transition-colors flex items-center gap-1.5"
-            >
-              <Layers size={13} className="text-[#ff1a2b]" />
-              <span>Looking for Ski Mask Category? →</span>
-            </a>
-            <div className="text-xs font-mono text-zinc-500 hidden sm:flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
-              <span>Pre-Registration Open</span>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        {/* Clean Header */}
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-12">
+          <div>
+            <div className="text-xs font-mono uppercase tracking-widest text-[#ff1a2b] font-bold mb-1.5 flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#ff1a2b]" />
+              <span>THE ARCHIVE VAULT</span>
             </div>
+            <h2 className="text-2xl sm:text-4xl font-black tracking-tight text-white font-display uppercase">
+              Drop 02 Collection
+            </h2>
+          </div>
+          <div className="text-xs font-mono text-zinc-400">
+            LIMITED TO 6 UNITS PER SIZE · PRE-REGISTRATION OPEN
           </div>
         </div>
 
-        {/* 3 Upcoming T-Shirt Editions Grid (Pink Earth, White Earth, Light Blue Earth) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {tshirtComingSoon.map((c) => {
-            return (
+        {/* 4 Clean Minimal Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {allDrop02Items.map((item) => (
+            <div
+              key={item.id}
+              className="bg-[#101014] border border-white/8 hover:border-white/25 transition-all flex flex-col justify-between group shadow-xl hover:shadow-2xl"
+            >
+              {/* Product Visual Pedestal */}
               <div
-                key={c.id}
-                className="group bg-[#141418] border border-white/5 hover:border-white/20 transition-all flex flex-col justify-between"
+                onClick={() => {
+                  onSelectColorway(item);
+                  document.getElementById('product')?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="relative aspect-square w-full bg-gradient-to-b from-[#16161b] via-[#121216] to-[#0d0d10] p-6 flex items-center justify-center cursor-pointer overflow-hidden border-b border-white/8 select-none"
               >
-                <div>
-                  {/* Image container */}
-                  <div
-                    onClick={() => {
-                      onSelectColorway(c);
-                      const target = document.getElementById('product');
-                      target?.scrollIntoView({ behavior: 'smooth' });
-                    }}
-                    className="relative aspect-square w-full bg-[#18181c] p-6 flex items-center justify-center cursor-pointer overflow-hidden"
-                  >
-                    <img
-                      src={c.image}
-                      alt={c.name}
-                      referrerPolicy="no-referrer"
-                      className="w-full h-full object-contain filter drop-shadow-[0_15px_25px_rgba(0,0,0,0.6)] group-hover:scale-105 transition-transform duration-300"
-                    />
+                <img
+                  src={item.image}
+                  alt={item.name}
+                  referrerPolicy="no-referrer"
+                  className="w-full h-full object-contain filter drop-shadow-[0_20px_35px_rgba(0,0,0,0.8)] group-hover:scale-105 transition-transform duration-300"
+                />
 
-                    {/* Tag overlay */}
-                    <div className="absolute top-3 left-3 flex items-center gap-1.5 text-[10px] font-mono tracking-wider uppercase text-amber-300 bg-amber-950/60 border border-amber-800/40 px-2 py-0.5">
-                      <span>COMING SOON</span>
-                    </div>
-
-                    <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity bg-black/80 px-2.5 py-1 text-[11px] text-white flex items-center gap-1.5 border border-white/10">
-                      <Eye size={12} className="text-[#ff1a2b]" />
-                      <span>Inspect</span>
-                    </div>
-                  </div>
-
-                  {/* Card Body */}
-                  <div className="p-5">
-                    <div className="flex items-center justify-between text-xs mb-2">
-                      <div className="flex items-center gap-2">
-                        <div
-                          className="w-3.5 h-3.5 rounded-full border border-black/30 shrink-0"
-                          style={{ backgroundColor: c.hex }}
-                        />
-                        <span className="text-zinc-400 text-[11px] font-medium">
-                          {c.colorName}
-                        </span>
-                      </div>
-                      <span className="font-mono text-zinc-200 font-bold text-xs tabular-nums">
-                        {c.price.toFixed(2)} AED
-                      </span>
-                    </div>
-
-                    <h3
-                      onClick={() => {
-                        onSelectColorway(c);
-                        const target = document.getElementById('product');
-                        target?.scrollIntoView({ behavior: 'smooth' });
-                      }}
-                      className="text-sm font-bold text-white group-hover:text-[#ff1a2b] transition-colors cursor-pointer line-clamp-1 font-display"
-                    >
-                      {c.name}
-                    </h3>
-
-                    <p className="text-[11px] text-zinc-400 mt-2 line-clamp-2 leading-relaxed">
-                      {c.washDetails}
-                    </p>
-                  </div>
+                <div className="absolute top-3 left-3 text-[10px] font-mono uppercase tracking-wider text-amber-300 bg-black/80 px-2 py-0.5 border border-white/10 backdrop-blur-sm">
+                  DROP 02 PREVIEW
                 </div>
 
-                {/* Card Actions */}
-                <div className="p-5 pt-0 grid grid-cols-2 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      onSelectColorway(c);
-                      const target = document.getElementById('product');
-                      target?.scrollIntoView({ behavior: 'smooth' });
-                    }}
-                    className="py-2.5 px-3 text-[11px] font-semibold uppercase tracking-wider bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-white/10 text-center transition-colors cursor-pointer"
-                  >
-                    View Cut
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => onOpenRestockModal(c.name)}
-                    className="py-2.5 px-3 text-[11px] font-bold uppercase tracking-wider bg-[#ff1a2b] hover:bg-[#e01424] text-white flex items-center justify-center gap-1 transition-colors cursor-pointer"
-                  >
-                    <Bell size={12} />
-                    <span>Drop Alert</span>
-                  </button>
+                <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity bg-black/90 px-2.5 py-1 text-xs text-white flex items-center gap-1.5 border border-white/10 backdrop-blur-sm">
+                  <Eye size={12} className="text-[#ff1a2b]" />
+                  <span>Inspect Piece</span>
                 </div>
               </div>
-            );
-          })}
-        </div>
 
-        {/* Drop 02 Early Access Roster Note */}
-        <div className="mt-12 p-6 bg-[#141418] border border-white/5 flex flex-col sm:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
-              <Sparkles size={20} />
+              {/* Minimal Card Details */}
+              <div className="p-5 flex-1 flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between text-xs mb-2">
+                    <div className="flex items-center gap-1.5">
+                      <div
+                        className="w-3 h-3 rounded-full border border-black/40 shrink-0"
+                        style={{ backgroundColor: item.hex }}
+                      />
+                      <span className="text-zinc-400 text-[11px] font-mono">
+                        {item.colorName}
+                      </span>
+                    </div>
+                    <span className="font-mono text-white font-bold text-xs tabular-nums">
+                      {item.price.toFixed(2)} AED
+                    </span>
+                  </div>
+
+                  <h3
+                    onClick={() => {
+                      onSelectColorway(item);
+                      document.getElementById('product')?.scrollIntoView({ behavior: 'smooth' });
+                    }}
+                    className="text-sm font-bold text-white group-hover:text-[#ff1a2b] transition-colors cursor-pointer truncate font-display uppercase tracking-tight flex items-center justify-between"
+                  >
+                    <span>{item.name}</span>
+                    <ArrowUpRight size={14} className="text-zinc-600 group-hover:text-[#ff1a2b] shrink-0 ml-1" />
+                  </h3>
+                </div>
+
+                {/* Pre-Register Action */}
+                <button
+                  type="button"
+                  onClick={() => onOpenRestockModal(item.name)}
+                  className="mt-5 w-full py-2.5 px-3 bg-zinc-900/90 hover:bg-[#ff1a2b] text-zinc-300 hover:text-white border border-white/10 hover:border-transparent text-xs font-mono font-semibold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-sm active:scale-[0.98]"
+                >
+                  <Bell size={12} />
+                  <span>Pre-Register Drop</span>
+                </button>
+              </div>
             </div>
-            <div>
-              <h4 className="text-sm font-bold text-white font-display">
-                Drop 02 Priority Roster
-              </h4>
-              <p className="text-xs text-zinc-400 mt-0.5">
-                Drop 02 releases with only 6 shirts per size. Pre-registered members receive password-protected early checkout.
-              </p>
-            </div>
-          </div>
-          <button
-            type="button"
-            onClick={() => onOpenRestockModal('Drop 02 T-Shirt Collection')}
-            className="px-6 py-2.5 text-xs font-bold uppercase tracking-widest bg-white hover:bg-zinc-200 text-black whitespace-nowrap transition-colors shrink-0 cursor-pointer"
-          >
-            Pre-Register For Drop 02 Tees
-          </button>
+          ))}
         </div>
       </div>
     </section>
